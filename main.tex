@@ -1,5 +1,82 @@
 \documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{geometry}
+\usepackage{listings} % <-- QUESTA È LA RIGA CHE RISOLVE L'ERRORE
+\usepackage{xcolor}   % <-- UTILE PER COLORARE IL CODICE
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black}
+\geometry{a4paper, margin=1in}
+
+
+% --- Stili e Ambienti Personalizzati ---
+\lstset{
+  language=Matlab,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{blue},
+  commentstyle=\color{green!60!black},
+  stringstyle=\color{purple},
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  literate=%
+    {à}{{\`a}}1
+    {è}{{\`e}}1
+    {é}{{\'e}}1
+    {ì}{{\`i}}1
+    {ò}{{\`o}}1
+    {ù}{{\`u}}1
+}
+
+\newtheoremstyle{break}
+  {\topsep}{\topsep}%
+  {\normalfont}{}%
+  {\bfseries}{.}%
+  {\newline}{}%
+  
+\theoremstyle{break}
+\newtheorem{osservazione}{Osservazione}[section]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definizione}[section]
+\newtheorem{esercizio}{Esercizio}[section]
+\newtheorem{teorema}{Teorema}[section]
+\newtheorem{corollario}{Corollario}[section]
+\newtheorem{esempio}{Esempio}[section]
+% --- Fine Stili ---
+
+\title{Appunti di Calcolo Numerico}
+\author{} % Lasciato vuoto o da compilare
+\date{\today}
 
 \begin{document}
-  prova
+
+\maketitle
+
+% Comando per generare l'indice
+\tableofcontents
+
+\newpage % Opzionale: per iniziare l'introduzione in una nuova pagina
+
+
+\section{Introduzione}
+
+L'Informatica Teorica si divide in due macro-aree fondamentali:
+
+\begin{itemize}
+    \item \textbf{Teoria della computabilità}: cerca modelli formali che si avvicinino al concetto logico e matematico di \textsc{algoritmo}.
+    \item \textbf{Teoria della complessità computazionale}: si occupa di determinare la quantità minima di risorse (principalmente spazio e tempo) necessarie ad un algoritmo per risolvere un dato problema.
+\end{itemize}
+
+\include{Capitoli/Teoria-della-calcolabilità}
+\include{Capitoli/Teoria-della-complessità}
+
+
 \end{document}
