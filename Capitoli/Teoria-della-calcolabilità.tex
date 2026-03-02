@@ -526,3 +526,195 @@ Sia $g: \mathbb{N}^2 \to \mathbb{N}$ una funzione rp.
     \item[c)] Sia $f_3(x) = g(x, x)$. Dimostrare che $f_3$ sia rp:
     $$ f_3(x) = \left( g \circ (\mathcal{E}_1^{(1)}, \mathcal{E}_1^{(1)}) \right)(x) $$
 \end{enumerate}
+
+
+
+%02/03/2026
+
+\vspace{0.6cm}
+\subsubsection{Relazioni ricorsive primitive}
+
+\textbf{Definizione:} Sia $R \subseteq \mathbb{N}^k$. Una funzione $f: \mathbb{N}^k \to \mathbb{N}$ si dice \textbf{BUONA per $R$} quando:
+$$ \forall\ \vec{x} \in \mathbb{N}^k, \quad f(\vec{x}) = 0 \iff \vec{x} \in R $$
+
+\vspace{0.4cm}
+\textbf{Definizione:} $R \subseteq \mathbb{N}^k$ (relazione k-aria) si dice \textbf{RICORSIVA PRIMITIVA (rp)} quando:
+$$ \exists\ f: \mathbb{N}^k \to \mathbb{N} \text{ rp t.c. } \forall\ \vec{x} \in \mathbb{N}^k, \quad f(\vec{x}) = 0 \iff \vec{x} \in R $$
+(cioè esiste $f$ rp che è buona per $R$).
+
+\vspace{0.4cm}
+\textbf{Osservazione:} $R \subseteq \mathbb{N}^k$ è rp $\iff \chi_R$ (FUNZIONE CARATTERISTICA di $R$) è rp.
+$$
+\chi_R : \mathbb{N}^k \to \mathbb{N}, \quad \chi_R(\vec{x}) = 
+\begin{cases} 
+1, & \text{se } \vec{x} \in R \\ 
+0, & \text{se } \vec{x} \notin R 
+\end{cases}
+$$
+
+\textit{Dimostrazione:}
+\begin{itemize}
+    \item[$\implies$)] $R$ rp $\implies$ sia $f: \mathbb{N}^k \to \mathbb{N}$ rp BUONA PER $R$.
+    $$ \chi_R(\vec{x}) = (\overline{sg} \circ f)(\vec{x}) $$
+    Essendo $\overline{sg}$ rp e $f$ rp (per ipotesi), la loro composizione $\chi_R$ è rp.
+    
+    \item[$\impliedby$)] $\chi_R$ è rp. Osservo che $\overline{sg} \circ \chi_R$ è BUONA PER $R$.
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $R \subseteq \mathbb{N}^k$ rp $\implies R^c = \mathbb{N}^k \setminus R$ rp.
+
+\textit{Dimostrazione:} \\
+$R$ rp $\implies \chi_R$ rp $\implies \chi_R$ è funzione BUONA PER $R^c$ ed è rp $\implies R^c$ rp.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $R, S \subseteq \mathbb{N}^k$ rp $\implies R \cup S$ rp.
+
+\textit{Dimostrazione:} \\
+$\chi_R, \chi_S$ sono rp.
+$$ \chi_{R \cup S}(\vec{x}) = sg \circ (\chi_R + \chi_S)(\vec{x}) $$
+\textit{(La somma fa 1 se solo una è vera, o 2 se entrambe vere, poi il $sg$ tronca a 1 se $\ge 2$)}
+$$ = \left( sg \circ (s \circ (\chi_R, \chi_S)) \right)(\vec{x}) $$
+Essendo ottenuta per composizione di funzioni rp, $\implies R \cup S$ rp.
+
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $R, S \subseteq \mathbb{N}^k$ rp $\implies R \cap S$ rp.
+
+\textit{Dimostrazione:} \\
+$\chi_R, \chi_S$ rp.
+$$ \chi_{R \cap S}(\vec{x}) = \chi_R(\vec{x}) \cdot \chi_S(\vec{x}) $$
+$$ = \left( p \circ (\chi_R, \chi_S) \right)(\vec{x}) $$
+Essendo ottenuta per composizione di funzioni rp (prodotto $p$), $\implies R \cap S$ rp.
+
+\vspace{0.6cm}
+\textbf{Definizione:} $f: \mathbb{N}^k \to \mathbb{N}$ si dice \textbf{DEFINITA PER CASI} a partire dalle funzioni $f_1, \dots, f_n$ e dalle relazioni $R_1, \dots, R_n$ quando:
+$$
+f(\vec{x}) = 
+\begin{cases} 
+f_1(\vec{x}), & \vec{x} \in R_1 \\ 
+f_2(\vec{x}), & \vec{x} \in R_2 \\ 
+\vdots & \vdots \\
+f_n(\vec{x}), & \vec{x} \in R_n 
+\end{cases}
+$$
+(Dove $R_1, \dots, R_n$ è una partizione di $\mathbb{N}^k$).
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $f: \mathbb{N}^k \to \mathbb{N}$ definita per casi da $f_1, \dots, f_n, R_1, \dots, R_n$. \\
+Se $f_1, \dots, f_n$ rp e $R_1, \dots, R_n$ rp $\implies f$ rp.
+
+\textit{Dimostrazione:}
+$$ f(\vec{x}) = f_1(\vec{x}) \cdot \chi_{R_1}(\vec{x}) + f_2(\vec{x}) \cdot \chi_{R_2}(\vec{x}) + \dots + f_n(\vec{x}) \cdot \chi_{R_n}(\vec{x}) $$
+Poiché somma e prodotto di funzioni rp sono rp, $f$ è rp.
+
+\vspace{0.4cm}
+\textbf{Proposizione:}
+$$
+f(\vec{x}) = 
+\begin{cases} 
+f_1(\vec{x}), & \vec{x} \in R_1 \\ 
+\vdots & \vdots \\
+f_{n-1}(\vec{x}), & \vec{x} \in R_{n-1} \\
+f_n(\vec{x}), & \text{ALTRIMENTI} 
+\end{cases}
+$$
+Se $f_1, \dots, f_n$ rp e $R_1, \dots, R_{n-1}$ rp $\implies f$ rp.
+
+\textit{Dimostrazione:} \\
+Sappiamo che $R_n = \mathbb{N}^k \setminus (R_1 \cup \dots \cup R_{n-1})$ (che corrisponde all' "altrimenti"). 
+Essendo ottenuta tramite unione e complemento di insiemi rp, $R_n$ è rp $\implies f$ rp.
+
+\vspace{0.6cm}
+\textbf{Esempio} \\
+Sia $R \subseteq \mathbb{N}^2$ definita ponendo $(x,y) \in R$ quando $x \le y$.
+$$
+\chi_R(x,y) = 
+\begin{cases} 
+1, & x \le y \\ 
+0, & x > y 
+\end{cases}
+$$
+$$ \chi_R(x,y) = sg(y \overset{\cdot}{-} x + \delta(x,y)) $$
+$$ = \left( sg \circ (s \circ (\overset{\cdot}{-} \circ (\mathcal{E}_2^{(2)}, \mathcal{E}_1^{(2)}), \delta)) \right)(x,y) $$
+
+\vspace{0.6cm}
+\textbf{Definizione:} Sia $R \subseteq \mathbb{N}^{k+1}$. $f: \mathbb{N}^k \to \mathbb{N}$ è definita per \textbf{MINIMIZZAZIONE} da $R$ quando:
+$$
+f(\vec{x}) = 
+\begin{cases} 
+\min \{ z \in \mathbb{N} \mid (\vec{x}, z) \in R \}, & \text{SE TALE INSIEME NON \`E VUOTO} \\ 
+0, & \text{ALTRIMENTI} 
+\end{cases}
+$$
+
+\vspace{0.4cm}
+\textbf{Definizione:} Sia $R \subseteq \mathbb{N}^{k+1}$. $f: \mathbb{N}^{k+1} \to \mathbb{N}$ è definita per \textbf{MINIMIZZAZIONE LIMITATA} da $R$ quando:
+$$
+f(\vec{x}, y) = 
+\begin{cases} 
+\min \{ z \le y \mid (\vec{x}, z) \in R \}, & \text{SE L'INSIEME NON \`E VUOTO} \\ 
+0, & \text{ALTRIMENTI} 
+\end{cases}
+$$
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $R$ decidibile $\implies f$ ottenuta per minimizzazione limitata da $R$ è computabile.
+
+\textit{Dimostrazione:} \\
+Sia $\mathcal{M}$ algoritmo di decisione per $R$. Costruiamo un algoritmo di calcolo per $f$: \\
+Su input $(\vec{x}, y) \in \mathbb{N}^{k+1}$:
+\begin{itemize}
+    \item Ciclo FOR: per $z$ da $0$ a $y$:
+    \begin{itemize}
+        \item Decido se $(\vec{x}, z) \in R$ (usando $\mathcal{M}$)
+        \item Se sì, restituisco $z$
+    \end{itemize}
+    \item Se il ciclo finisce senza aver trovato niente, restituisco $0$.
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $R$ rp $\implies f$ ottenuta per minimizzazione limitata da $R$ è rp.
+
+\textit{Dimostrazione:} \\
+Vogliamo trovare uno schema di Ricorsione Primitiva con $f$:
+$$
+\begin{cases} 
+f(\vec{x}, 0) = g(\vec{x}) \\ 
+f(\vec{x}, y+1) = \varphi(\vec{x}, y, f(\vec{x}, y)) 
+\end{cases}
+$$
+
+\begin{itemize}
+    \item $f(\vec{x}, 0) = 0 = C_0^{(k)}(\vec{x})$ \quad (che è rp)
+    \item $f(\vec{x}, y+1) = \begin{cases} f(\vec{x}, y), & \text{SE } \exists\ z, \ 0 \le z \le y \text{ t.c. } (\vec{x}, z) \in R \\ y+1, & \text{SE NON SONO NEL CASO PRECEDENTE E } (\vec{x}, y+1) \in R \\ 0, & \text{ALTRIMENTI} \end{cases}$
+\end{itemize}
+
+Dunque definiamo $\varphi$:
+$$
+\varphi(\vec{x}, y, t) = 
+\begin{cases} 
+t = \mathcal{E}_{k+2}^{(k+2)}(\vec{x}, y, t) & \text{SE } (\vec{x}, y, t) \in R_1 \\ 
+y+1 = (S \circ \mathcal{E}_{k+1}^{(k+2)})(\vec{x}, y, t) & \text{SE } (\vec{x}, y, t) \in R_2 \\ 
+0 = C_0^{(k+2)}(\vec{x}, y, t) & \text{ALTRIMENTI} 
+\end{cases}
+$$
+
+Dove:
+$$ R_1 = \{ (\vec{x}, y, t) \mid \exists\ z, \ 0 \le z \le y : (\vec{x}, z) \in R \} $$
+$$ R_2 = \{ (\vec{x}, y, t) \mid (\vec{x}, y, t) \notin R_1 \text{ e } (\vec{x}, y+1) \in R \} $$
+
+Per costruzione, $f(\vec{x}, y+1) = \varphi(\vec{x}, y, f(\vec{x}, y))$. Resta da mostrare che $\varphi$ è rp. 
+Ricordiamo che, per ipotesi, $R$ è rp, dunque $\chi_R$ è rp.
+
+Analizziamo $R_1$:
+$$ \chi_{R_1}(\vec{x}, y, t) = sg \left( \underbrace{ \sum_{z=0}^{y} \chi_R(\vec{x}, z) }_{\text{operatore di somma limitata applicato a } \chi_R \text{ rp } \implies \text{ rp}} \right) $$
+Essendo $sg$ e la somma limitata entrambe operazioni che mantengono la ricorsività primitiva, $\chi_{R_1}$ è rp.
+
+Sia $T = \{ (\vec{x}, y, t) \in \mathbb{N}^{k+2} \mid (\vec{x}, y+1) \in R \}$.
+$$ \chi_T(\vec{x}, y, t) = \chi_R(\vec{x}, y+1) = \left( \chi_R \circ (\mathcal{E}_1^{(k+2)}, \dots, \mathcal{E}_k^{(k+2)}, S \circ \mathcal{E}_{k+1}^{(k+2)}) \right)(\vec{x}, y, t) $$
+Da cui $\chi_T$ è rp.
+
+Infine per $R_2$:
+$$ R_2 = R_1^c \cap T $$
+Poiché $R_1$, e di conseguenza $R_1^c$, sono rp, e $T$ è rp, anche $R_2$ è rp.
