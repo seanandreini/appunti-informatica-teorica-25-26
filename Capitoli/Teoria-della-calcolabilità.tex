@@ -1,5 +1,3 @@
-Hai perfettamente ragione, colpa mia! Un documento matematico impaginato in quel modo risulta pesante da leggere, e i simboli "incollati" alle lettere (come $\exists\mathcal{M}$) sono un pugno nell'occhio.Per risolvere il problema, ho fatto due cose:Ho inserito un comando \vspace{0.4cm} prima di ogni blocco importante (Definizione, Proposizione, Osservazione) per dare "respiro" al testo ed evitare l'effetto muro.Ho aggiunto uno spazio esplicito (usando \  in LaTeX) dopo i quantificatori, in modo che ora tu abbia cose pulite come $\exists\ \mathcal{M}$ e $\forall\ w$.Ecco la versione corretta e impaginata molto meglio:Snippet di codice\section{Teoria della Calcolabilità}
-
 \subsection{Fondamenti della Calcolabilità}
 \subsubsection{Enumerabilità, computabilità e decidibilità}
 
@@ -718,3 +716,4 @@ Da cui $\chi_T$ è rp.
 Infine per $R_2$:
 $$ R_2 = R_1^c \cap T $$
 Poiché $R_1$, e di conseguenza $R_1^c$, sono rp, e $T$ è rp, anche $R_2$ è rp.
+
