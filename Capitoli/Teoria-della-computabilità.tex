@@ -1,4 +1,4 @@
-Hai perfettamente ragione, colpa mia! Un documento matematico impaginato in quel modo risulta pesante da leggere, e i simboli "incollati" alle lettere (come $\exists\mathcal{M}$) sono un pugno nell'occhio.Per risolvere il problema, ho fatto due cose:Ho inserito un comando \vspace{0.4cm} prima di ogni blocco importante (Definizione, Proposizione, Osservazione) per dare "respiro" al testo ed evitare l'effetto muro.Ho aggiunto uno spazio esplicito (usando \  in LaTeX) dopo i quantificatori, in modo che ora tu abbia cose pulite come $\exists\ \mathcal{M}$ e $\forall\ w$.Ecco la versione corretta e impaginata molto meglio:Snippet di codice\section{Teoria della Calcolabilità}
+\section{Teoria dellla computabilità}
 
 \subsection{Fondamenti della Calcolabilità}
 \subsubsection{Enumerabilità, computabilità e decidibilità}
@@ -598,7 +598,7 @@ f_2(\vec{x}), & \vec{x} \in R_2 \\
 f_n(\vec{x}), & \vec{x} \in R_n 
 \end{cases}
 $$
-(Dove $R_1, \dots, R_n$ è una partizione di $\mathbb{N}^k$).
+(Dove $R_1, \dots, R_n$ è una partizione di $\mathbb{N}^k$). (questa definizione si collega all'idea di "if-then-else" in programmazione)
 
 \vspace{0.4cm}
 \textbf{Proposizione:} $f: \mathbb{N}^k \to \mathbb{N}$ definita per casi da $f_1, \dots, f_n, R_1, \dots, R_n$. \\
@@ -718,3 +718,382 @@ Da cui $\chi_T$ è rp.
 Infine per $R_2$:
 $$ R_2 = R_1^c \cap T $$
 Poiché $R_1$, e di conseguenza $R_1^c$, sono rp, e $T$ è rp, anche $R_2$ è rp.
+
+
+
+
+%04/03/2026
+\vspace{0.6cm}
+\subsubsection{Funzione di Ackermann e funzioni $\mu$-ricorsive}
+
+\textbf{Proposizione:} l'insieme delle funzioni rp è \textbf{enumerabile}. (si può scrivere un algoritmo che produce una dopo l'altra tutte le funzioni rp).\\
+\textbf{Dimostrazione:} $f$ funzione rp \\
+cioè ha una drp: $f_1, f_2, \dots, f_n = f$ \\
+Posso codificare $f$ usando le funzioni iniziali tramite cui $f$ è costruita usando composizione e RP.
+$$ \Sigma = \{ C, 0, 1, \dots, 9, S, \mathcal{E},  \text{ ',' } , \circ, (, ), R, \langle, \rangle \} $$
+\textit{(Nota: con $C$ e le cifre codifichiamo una delle funzioni costanti; la virgola serve per separare i parametri; $\circ$ indica la composizione; $\langle \rangle$ si usano per rappresentare l'inizio e la fine della codifica di una funzione)}
+
+\textbf{Regole di codifica:}
+\begin{itemize}
+    \item $C_0^{(k)} \leadsto Ck$ \quad (es. $C_0^{(27)} \leadsto C27$)
+    \item $S \leadsto S$
+    \item $\mathcal{E}_j^{(k)} \leadsto \mathcal{E}k,j$ \quad (es. $\mathcal{E}_7^{(12)} \leadsto \mathcal{E}12,7$)
+    \item $f \circ (g_1, \dots, g_n) \leadsto \langle \langle f \rangle \circ (\langle g_1 \rangle, \dots, \langle g_n \rangle) \rangle$
+    \item $f$ ottenuta per RP da $g$ e $\varphi$: \\
+    $f = R(g, \varphi) \leadsto R(\langle g \rangle, \langle \varphi \rangle)$
+\end{itemize}
+
+\textbf{Es:}
+$$ S = R(\mathcal{E}_1^{(1)}, S \circ \mathcal{E}_3^{(3)}) \leadsto \langle R( \langle \mathcal{E}1,1 \rangle, \langle \langle S \rangle \circ (\langle \mathcal{E}3,3 \rangle) \rangle ) \rangle $$
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\exists$ una funzione computabile unaria che non è rp.
+
+\textit{Dimostrazione:} \\
+Per assurdo, supponiamo che ogni funzione computabile unaria sia rp. \\
+Per la proposizione precedente (sulla codifica), l'insieme delle funzioni rp unarie è \textbf{enumerabile}. \\
+Cioè $\exists$ un algoritmo di enumerazione che produce la sequenza:
+$$ f_0, f_1, f_2, \dots, f_x, \dots \quad \text{(lista delle funzioni rp unarie prodotte dall'algoritmo di enumerazione)} $$
+
+Definisco la funzione successore diagonale: $g(x) = f_x(x) + 1$ dove + 1 indica la funzione successore. 
+
+\textbf{Osservazione:}
+\begin{itemize}
+    \item $g$ è computabile perché $f_x$ e $S$ sono computabili.
+    \item $\exists\ u$ t.c. $g = f_u$ (segue dall'ipotesi iniziale che ogni funzione computabile unaria è rp, e quindi è presente nella lista di enumerazione).
+\end{itemize}
+
+Quanto fa $g(u)$?
+Dalla definizione di $g$: $g(u) = f_u(u) + 1$ \\
+Ma sapendo che $g = f_u$, si ha: $g(u) = f_u(u)$ \\
+$$ \implies \textbf{! ASSURDO !} $$
+
+\vspace{0.6cm}
+\textbf{FUNZIONE DI ACKERMANN}
+
+$A: \mathbb{N}^2 \to \mathbb{N}$
+$$
+\begin{cases}
+A(0, y) = y+1 \\
+A(x+1, 0) = A(x, 1) \\
+A(x+1, y+1) = A(x, A(x+1, y))
+\end{cases}
+$$
+ 
+(Dimostra che non tutte le funzioni calcolabili sono rp, e che esistono funzioni che crescono più velocemente di qualsiasi funzione rp).
+
+\vspace{0.4cm}
+\textbf{Esempi:}
+\begin{align*}
+A(1,1) &= A(0, A(1,0)) \\
+&= 1 + A(1,0) \\
+&= 1 + A(0,1) \\
+&= 1 + 2 = 3
+\end{align*}
+
+\begin{align*}
+A(2,4) &= A(1, A(2,3)) = 11 \\
+A(2,3) &= A(1, A(2,2)) \\
+A(2,2) &= A(1, A(2,1)) = A(1,5) = A(0, A(1,4)) \\
+A(2,1) &= A(1, A(2,0)) = A(1, A(1,1)) = A(1,3) \\
+&= A(0, A(1,2)) \\
+&= 1 + A(1,2) \\
+&= 1 + A(0, A(1,1)) \\
+&= 1 + 4 = 5
+\end{align*}
+
+\textit{È una funzione che cresce molto per anche aumenti minimi dei parametri.}
+
+\begin{itemize}
+    \item $A(0, y) = y+1$
+    \item $A(1, y) = y+2$ \\
+    \textit{Dimostrazione per induzione su $y$:} \\
+    - Base: $A(1,0) = A(0,1) = 2 = 0+2$ \\
+    - Passo: Supponiamo che $A(1,y) = y+2$. \\
+    $A(1, y+1) = A(0, A(1,y)) = 1 + A(1,y) = 1 + y + 2 = y+3 = (y+1)+2$
+    
+    \item $A(2,y) = 2y + 3$
+    \item $A(3,y) = 2^{y+3} - 3$
+    \item $A(4,y) = \underbrace{2^{2^{\dots^{2^{16}}}}}_{y \text{ volte}} - 3$
+\end{itemize}
+
+\vspace{0.6cm}
+\textbf{PROPRIETÀ DI A}
+
+\begin{enumerate}
+    \item $A(x,y) \ge y+1$
+    \item $A(x,y) < A(x, y+1)$ \\
+    \textit{Dimostrazione per induzione su $x$:}
+    \begin{itemize}
+        \item $x=0$: $A(0,y) = y+1 < y+2 = A(0, y+1)$
+        \item Supponiamo che $A(x,y) < A(x, y+1)$ \\
+        $A(x+1, y) \underset{\text{\scriptsize per Prop 1}}{\le} A(x+1, y) + 1 \le A(x, A(x+1, y)) = A(x+1, y+1)$
+    \end{itemize}
+    \item $A(x, y+1) \le A(x+1, y)$
+    \item $A(x, y) < A(x+1, y)$
+    \item $A(x_1, y) + A(x_2, y) < A(\max(x_1, x_2) + 4, y)$ (qui la cosa importante è notare come si passi due parametri $x_1$ e $x_2$ a un unico parametro $\max(x_1, x_2) + 4$)
+    \item $A(x, y) + y \le A(x+4, y)$
+\end{enumerate}
+
+\vspace{0.6cm}
+\textbf{Proposizione:} $\forall\ g: \mathbb{N}^k \to \mathbb{N}$ rp, $\exists\ c \in \mathbb{N} :$
+$$ \forall\ \vec{x} \in \mathbb{N}^k, \quad g(\vec{x}) < A\left(c, \sum_{i=1}^{k} x_i\right) $$
+
+\textbf{Dimostrazione:} Per induzione strutturale sulla costruzione di $g$
+\begin{itemize}
+    \item \text{Funzioni iniziali:}
+    \begin{itemize}
+        \item $C_0^{(k)}(\vec{x}) = 0 < 1 + \sum_{i=1}^{k} x_i = A\left( \overset{\text{\scriptsize c=0}}{0}, \sum_{i=1}^{k} x_i \right)$
+        \item $S(x) = x+1 < x+2 = A(0, x+1) \overset{\text{\scriptsize (3)}}{\le} A\left( \underset{\text{\scriptsize (c=1)}}{1}, x \right)$
+        \item $\mathcal{E}_j^{(k)}(\vec{x}) = x_j < 1 + \sum_{i=1}^{k} x_i = A\left( \underset{\text{\scriptsize c=0}}{0}, \sum_{i=1}^{k} x_i \right)$
+    \end{itemize}
+    $\implies$ La proposizione vale per le funzioni iniziali.
+
+    \item \textbf{Composizione:} $g(\vec{x}) = h \circ (f_1(\vec{x}), \dots, f_n(\vec{x}))$ \\
+    Supponiamo che:
+    \begin{itemize}
+        \item $h(x_1, \dots, x_n) < A\left(D, \sum_{i=1}^{n} x_i\right) \quad (\exists\ D \in \mathbb{N})$
+        \item $\forall\ j=1\dots n, \quad f_j(\vec{x}) < A\left(C_j, \sum_{i=1}^{k} x_i\right) \quad (\exists\ C_j \in \mathbb{N})$
+    \end{itemize}
+    Calcoliamo:
+    \begin{align*}
+    g(\vec{x}) &= h(f_1(\vec{x}), \dots, f_n(\vec{x})) < A\left(D, \sum_{i=1}^{n} f_i(\vec{x})\right) \\
+    &< A\left(D, \sum_{i=1}^{n} A\left(C_j, \sum_{i=1}^{k} x_i\right)\right) \\
+    &\underset{\text{\scriptsize iterando la (5)}}{\le} A\left(D, A\left(\widetilde{C}, \sum_{i=1}^{k} x_i\right)\right) \quad \text{dove } \widetilde{C} = \max_i(C_i) + 4 \\
+    &\le A\left(E, A\left(E+1, \sum_{i=1}^{k} x_i\right)\right) \\
+    &= A\left(E+1, \sum_{i=1}^{k} x_i + 1\right) \\
+    &\le A\left(E+2, \sum_{i=1}^{k} x_i\right)
+    \end{align*}
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $A$ non è rp.
+
+\textit{Dimostrazione:} \\
+Supponiamo per assurdo che $A$ sia rp. \\
+Allora la funzione $B(x) = A(x,x)$ è rp \\
+(poiché $B(x) = (A \circ (\mathcal{E}_1^{(1)}, \mathcal{E}_1^{(1)}))(x)$)
+
+Dunque per $B$ deve valere la proposizione precedente:
+$$ \implies \forall\ x \in \mathbb{N}, \exists\ c \in \mathbb{N} \text{ t.c. } B(x) < A(c, x) $$
+
+Calcolo $B(c)$:
+$$ A(c,c) = B(c) < A(c,c) \quad \textbf{! ASSURDO !} $$
+
+
+
+
+%05/03/2026
+\subsubsection{Funzioni $\mu$-ricorsive}
+\textit{Aggiungiamo un costrutto per estendere la classe delle funzioni rp, in modo da riuscire a catturare anche $A$ e altre funzioni che crescono più velocemente di qualsiasi funzione rp.}
+
+\vspace{0.4cm}
+\textbf{Definizione:} $g: \mathbb{N}^{k+1} \to \mathbb{N}$ si dice \textbf{REGOLARE} quando:
+$$ \forall\ \vec{x} \in \mathbb{N}^k, \ \exists\ y \in \mathbb{N} : g(\vec{x}, y) = 0 $$
+
+\vspace{0.4cm}
+\textbf{Definizione:} $f: \mathbb{N}^k \to \mathbb{N}$ si dice \textbf{OTTENUTA PER MINIMIZZAZIONE} da $g: \mathbb{N}^{k+1} \to \mathbb{N}$ regolare quando:
+$$ f(\vec{x}) = \min \{ y \in \mathbb{N} \mid g(\vec{x}, y) = 0 \} $$
+
+\vspace{0.4cm}
+\textbf{Definizione:} UNA \textbf{DERIVAZIONE $\mu$-RICORSIVA} È UNA SEQUENZA di funzioni $f_1, f_2, \dots, f_n$ tale che $\forall\ i = 1, \dots, n$:
+\begin{itemize}
+    \item $f_i$ è FUNZIONE INIZIALE, oppure
+    \item $f_i$ è OTTENUTA PER COMPOSIZIONE DA FUNZIONI PRECEDENTI, oppure
+    \item $f_i$ è OTTENUTA PER RP DA 2 FUNZIONI PRECEDENTI, oppure
+    \item $f_i$ è OTTENUTA DA $f_j$ REGOLARE PER MINIMIZZAZIONE (con $j < i$, ovvero $f_j$ è precedente a $f_i$).
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Definizione:} UNA FUNZIONE SI DICE \textbf{$\mu$-RICORSIVA} QUANDO COMPARE IN CODA A UNA DERIVAZIONE $\mu$-RICORSIVA.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $g$ computabile $\implies f$ computabile \quad \textit{(riferito a queste $g$ ed $f$)}
+
+\textit{Dimostrazione:} \\
+Sia $\mathcal{G}$ algoritmo di calcolo per $g$. \\
+Algoritmo di calcolo per $f$:
+\begin{itemize}
+    \item Data $\vec{x} \in \mathbb{N}^k$
+    \item mentre $y \ge 0$:
+    \item $\left. \begin{array}{l} \text{Calcolo } g(\vec{x}, y) \text{ (usando } \mathcal{G}) \\ \text{Se ottengo } 0, \text{ restituisco } y \end{array} \right\}$ \textit{(Ciclo While)}
+\end{itemize}
+
+\vspace{0.4cm}
+Ci sono indizi che ci fanno pensare che è una classe robusta (più della rp):
+\begin{itemize}
+    \item La funzione di Ackermann è $\mu$-ricorsiva.
+    \item Non conosciamo (ad oggi) alcun controesempio.
+    \item Ci sono anche altre proposte di definizioni (ed è quindi molto improbabile che tutte queste definizioni, che sono diverse tra loro, siano tutte sbagliate).
+\end{itemize}
+\vspace{0.6cm}
+\textbf{Tesi di Church (per le funzioni $\mu$-ricorsive)} \\
+La classe delle funzioni computabili coincide con la classe delle funzioni $\mu$-ricorsive. \\
+\textit{(Tesi e non Teorema perché non c'è dimostrazione matematica formale dell'idea di "calcolabile")}
+
+\vspace{0.8cm}
+\subsection{Macchine di Turing}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c}
+\multicolumn{10}{l}{\scriptsize Nastro organizzato in celle (ogni cella un simbolo)} \\
+\hline
+\dots & * & a & a & b & a & * & b & b & \dots \\
+\hline
+\multicolumn{2}{c}{} & $\underset{\substack{\uparrow \\ \text{\scriptsize TESTINA} \\ \text{\scriptsize (DI LETTURA E SCRITTURA)}}}{\Delta}$ & \multicolumn{7}{c}{\scriptsize (Bi-infinito)}
+\end{tabular}
+\end{center}
+
+Ogni cella è predisposta per accogliere un simbolo.
+
+\vspace{0.4cm}
+$\Sigma \cup \{*\}$ Alfabeto.
+
+Ad ogni istante la macchina, in base a quello che legge e allo stato in cui si trova, può fare una di queste tre operazioni:
+\begin{itemize}
+    \item Sovrascrivere (aggiornare) il simbolo
+    \item Spostarsi (a destra o a sinistra)
+    \item Aggiornare lo stato
+\end{itemize}
+
+$Q$ insieme degli stati $\{q_0, q_1, q_2, \dots\}$
+
+\vspace{0.4cm}
+\textbf{Transizione} (singolo passo di calcolo/computazione):
+$$ ( \underbrace{q}_{\text{\scriptsize stato}}, \underbrace{X}_{\text{\scriptsize simbolo}}, \underbrace{\alpha}_{\text{\scriptsize azione}}, \underbrace{\tilde{q}}_{\text{\scriptsize stato di arrivo}} ) \in Q \times \Sigma \times (\Sigma \cup \{D, S\}) \times Q $$
+Dove $\alpha \in \Sigma \cup \{D, S\}$ indica:
+\begin{itemize}
+    \item $D, S$: passo a destra, passo a sinistra
+    \item Se $\alpha \in \Sigma$: scrivo sul nastro senza spostamento
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Configurazione:} È la coppia $(q, X)$, dove:
+\begin{itemize}
+    \item $q$ è lo stato in cui si trova la macchina
+    \item $X$ è la stringa che rappresenta il contenuto del nastro 
+\end{itemize}    
+
+\vspace{0.5cm}
+\textbf{Quartupla funzionale nei primi 2 argomenti:} Fissati i primi 2 argomenti (lo stato corrente e il simbolo letto), esiste al più una transizione. Questo garantisce che la macchina sia \textit{deterministica}.
+
+\vspace{0.4cm}
+\textbf{Definizione:} Una \textbf{Macchina di Turing} (MdT) è una lista di transizioni (cioè una lista di quadruple funzionali nei primi 2 argomenti).
+
+\newpage
+\textbf{Esempi}
+
+\textbf{1)}
+\begin{itemize}
+    \item[] $q_0 \ * \ D \ q_1$
+    \item[] $q_0 \ 1 \ D \ q_1$
+\end{itemize}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+& 1 & 1 & 1 & 1 & 1 & \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_0}}{\Delta}$} & \multicolumn{5}{c}{}
+\end{tabular}
+\end{center}
+\textit{Questa macchina fa solo un passo a destra e si ferma.}
+
+\vspace{0.6cm}
+\textbf{2)}
+\begin{itemize}
+    \item[] $q_0 \ * \ D \ q_0$
+    \item[] $q_0 \ 1 \ D \ q_1$
+    \item[] $q_1 \ 1 \ D \ q_1$
+\end{itemize}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+& * & * & 1 & 1 & 1 & & \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_0}}{\Delta}$} & \multicolumn{6}{c}{}
+\end{tabular}
+\end{center}
+\textit{Legge gli asterischi spostandosi a destra; quando trova un $1$, passa allo stato $q_1$ e continua a scorrere gli $1$ verso destra.}
+
+\vspace{0.6cm}
+\textbf{3)}
+\begin{itemize}
+    \item[] $q_0 \ * \ 1 \ q_0$
+    \item[] $q_0 \ 1 \ D \ q_1$
+    \item[] $q_1 \ * \ 1 \ q_1$
+    \item[] $q_1 \ 1 \ 1 \ q_0$
+\end{itemize}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+& 1 & 1 & & \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_0}}{\Delta}$} & \multicolumn{1}{c}{}
+\end{tabular}
+\end{center}
+\textit{Mette tutti $1$ e non termina mai. \\
+(Nota: si può scrivere anche come $q_0 \ * \ 1 \ q_0$ seguito da $q_0 \ 1 \ D \ q_0$, poiché per fare la stessa cosa ci possono essere più Macchine di Turing.}
+
+\vspace{0.6cm}
+\textbf{4) Funzione Successore}
+\begin{itemize}
+    \item[] $q_0 \ * \ D \ q_1$
+    \item[] $q_1 \ 1 \ D \ q_1$
+    \item[] $q_1 \ * \ 1 \ q_2$
+    \item[] $q_2 \ 1 \ S \ q_2$
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Definizione:} Una MdT $M$ \textbf{calcola una funzione} $f$ quando, fatta partire sulla cella vuota all'immediata sinistra dell'input, termina sulla cella vuota all'immediata sinistra dell'output.
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c}
+\hline
+\dots * & & * & & * & & \dots \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ \text{\scriptsize per calcolare } f \text{\scriptsize\ con più} \\ \text{\scriptsize parametri}}}{\Delta}$} & \multicolumn{5}{c}{}
+\end{tabular}
+\end{center}
+Cioè si inserisce degli * per delimitare i parametri.
+
+\vspace{0.6cm}
+\textbf{5) Funzione Somma}
+\begin{itemize}
+    \item[] $q_0 \ * \ D \ q_1$
+    \item[] $q_1 \ 1 \ D \ q_1$
+    \item[] $q_1 \ * \ 1 \ q_2$
+    \item[] $q_2 \ 1 \ D \ q_2$
+    \item[] $q_2 \ * \ S \ q_3$
+    \item[] $q_3 \ 1 \ * \ q_3$
+    \item[] $q_3 \ * \ S \ q_4$
+    \item[] $q_4 \ 1 \ * \ q_4$
+    \item[] $q_4 \ * \ S \ q_5$
+    \item[] $q_5 \ 1 \ S \ q_5$
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c}
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{3}{c}{$\overbrace{\hspace{2.5cm}}^{3}$} & \multicolumn{1}{c}{} & \multicolumn{2}{c}{$\overbrace{\hspace{1.5cm}}^{2}$} & \multicolumn{1}{c}{} \\
+\hline
+* & 1 & 1 & 1 & \textbf{1} & 1 & 1 & \textbf{*} & * \\
+\hline
+\multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_0}}{\Delta} \rightarrow \underset{\substack{\uparrow \\ q_1}}{\Delta}$} & \multicolumn{1}{c}{\dots} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_2}}{\Delta}$} & \multicolumn{1}{c}{\dots} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_4}}{\Delta}$} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_3}}{\Delta}$} & \multicolumn{1}{c}{}
+\end{tabular}
+\end{center}
+\textit{(Nota: La macchina scorre a destra trasformando l'asterisco centrale in un $1$, unendo così i due blocchi. Arrivata in fondo, cancella l'ultimo $1$ sostituendolo con un $*$ per mantenere la corretta decodifica unaria della somma, poi torna indietro fino all'asterisco iniziale per fermarsi).}
+
+\vspace{0.6cm}
+\textbf{Funzione $\tau$-ricorsiva:} Una funzione $f: \mathbb{N}^k \to \mathbb{N}$ si dice $\tau$-ricorsiva quando $\exists$ M MdT che calcola $f$.
+
+\vspace{0.4cm}
+\textbf{Tesi di Church (per funzioni $\tau$-ricorsive):} La classe delle funzioni computabili coincide con la classe delle funzioni $\tau$-ricorsive.
+
+\vspace{0.6cm}
+\textbf{Esercizio} \\
+Siano $f: \mathbb{N} \to \mathbb{N}$ rp, $R \subseteq \mathbb{N}^k$ rp (quindi $\chi_R$ è rp). \\
+Definisco $S \subseteq \mathbb{N}^k$ ponendo $\vec{x} \in S$ usando $(f(x_1), \dots, f(x_k)) \in R$. \\
+Dimostrare che $S$ è rp.
+
+\textit{Dimostrazione:}
+$$ \chi_S(\vec{x}) = \chi_R \circ (f \circ \mathcal{E}_1^{(k)}, \dots, f \circ \mathcal{E}_k^{(k)})(\vec{x}) $$
+Essendo $S$ definita tramite la composizione della funzione caratteristica di $R$ (che è rp per ipotesi) con una serie di composizioni di $f$ (rp per ipotesi) e le proiezioni (rp in quanto funzioni iniziali), la funzione $\chi_S$ è ottenuta per composizione di funzioni rp, ed è quindi essa stessa rp. Di conseguenza, l'insieme $S$ è rp.
