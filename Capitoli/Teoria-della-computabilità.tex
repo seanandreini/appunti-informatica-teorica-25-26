@@ -598,7 +598,7 @@ f_2(\vec{x}), & \vec{x} \in R_2 \\
 f_n(\vec{x}), & \vec{x} \in R_n 
 \end{cases}
 $$
-(Dove $R_1, \dots, R_n$ è una partizione di $\mathbb{N}^k$).
+(Dove $R_1, \dots, R_n$ è una partizione di $\mathbb{N}^k$). (questa definizione si collega all'idea di "if-then-else" in programmazione)
 
 \vspace{0.4cm}
 \textbf{Proposizione:} $f: \mathbb{N}^k \to \mathbb{N}$ definita per casi da $f_1, \dots, f_n, R_1, \dots, R_n$. \\
@@ -779,6 +779,8 @@ A(x+1, 0) = A(x, 1) \\
 A(x+1, y+1) = A(x, A(x+1, y))
 \end{cases}
 $$
+ 
+(Dimostra che non tutte le funzioni calcolabili sono rp, e che esistono funzioni che crescono più velocemente di qualsiasi funzione rp).
 
 \vspace{0.4cm}
 \textbf{Esempi:}
@@ -877,3 +879,221 @@ $$ \implies \forall\ x \in \mathbb{N}, \exists\ c \in \mathbb{N} \text{ t.c. } B
 
 Calcolo $B(c)$:
 $$ A(c,c) = B(c) < A(c,c) \quad \textbf{! ASSURDO !} $$
+
+
+
+
+%05/03/2026
+\subsubsection{Funzioni $\mu$-ricorsive}
+\textit{Aggiungiamo un costrutto per estendere la classe delle funzioni rp, in modo da riuscire a catturare anche $A$ e altre funzioni che crescono più velocemente di qualsiasi funzione rp.}
+
+\vspace{0.4cm}
+\textbf{Definizione:} $g: \mathbb{N}^{k+1} \to \mathbb{N}$ si dice \textbf{REGOLARE} quando:
+$$ \forall\ \vec{x} \in \mathbb{N}^k, \ \exists\ y \in \mathbb{N} : g(\vec{x}, y) = 0 $$
+
+\vspace{0.4cm}
+\textbf{Definizione:} $f: \mathbb{N}^k \to \mathbb{N}$ si dice \textbf{OTTENUTA PER MINIMIZZAZIONE} da $g: \mathbb{N}^{k+1} \to \mathbb{N}$ regolare quando:
+$$ f(\vec{x}) = \min \{ y \in \mathbb{N} \mid g(\vec{x}, y) = 0 \} $$
+
+\vspace{0.4cm}
+\textbf{Definizione:} UNA \textbf{DERIVAZIONE $\mu$-RICORSIVA} È UNA SEQUENZA di funzioni $f_1, f_2, \dots, f_n$ tale che $\forall\ i = 1, \dots, n$:
+\begin{itemize}
+    \item $f_i$ è FUNZIONE INIZIALE, oppure
+    \item $f_i$ è OTTENUTA PER COMPOSIZIONE DA FUNZIONI PRECEDENTI, oppure
+    \item $f_i$ è OTTENUTA PER RP DA 2 FUNZIONI PRECEDENTI, oppure
+    \item $f_i$ è OTTENUTA DA $f_j$ REGOLARE PER MINIMIZZAZIONE (con $j < i$, ovvero $f_j$ è precedente a $f_i$).
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Definizione:} UNA FUNZIONE SI DICE \textbf{$\mu$-RICORSIVA} QUANDO COMPARE IN CODA A UNA DERIVAZIONE $\mu$-RICORSIVA.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $g$ computabile $\implies f$ computabile \quad \textit{(riferito a queste $g$ ed $f$)}
+
+\textit{Dimostrazione:} \\
+Sia $\mathcal{G}$ algoritmo di calcolo per $g$. \\
+Algoritmo di calcolo per $f$:
+\begin{itemize}
+    \item Data $\vec{x} \in \mathbb{N}^k$
+    \item mentre $y \ge 0$:
+    \item $\left. \begin{array}{l} \text{Calcolo } g(\vec{x}, y) \text{ (usando } \mathcal{G}) \\ \text{Se ottengo } 0, \text{ restituisco } y \end{array} \right\}$ \textit{(Ciclo While)}
+\end{itemize}
+
+\vspace{0.4cm}
+Ci sono indizi che ci fanno pensare che è una classe robusta (più della rp):
+\begin{itemize}
+    \item La funzione di Ackermann è $\mu$-ricorsiva.
+    \item Non conosciamo (ad oggi) alcun controesempio.
+    \item Ci sono anche altre proposte di definizioni (ed è quindi molto improbabile che tutte queste definizioni, che sono diverse tra loro, siano tutte sbagliate).
+\end{itemize}
+\vspace{0.6cm}
+\textbf{Tesi di Church (per le funzioni $\mu$-ricorsive)} \\
+La classe delle funzioni computabili coincide con la classe delle funzioni $\mu$-ricorsive. \\
+\textit{(Tesi e non Teorema perché non c'è dimostrazione matematica formale dell'idea di "calcolabile")}
+
+\vspace{0.8cm}
+\subsection{Macchine di Turing}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c}
+\multicolumn{10}{l}{\scriptsize Nastro organizzato in celle (ogni cella un simbolo)} \\
+\hline
+\dots & * & a & a & b & a & * & b & b & \dots \\
+\hline
+\multicolumn{2}{c}{} & $\underset{\substack{\uparrow \\ \text{\scriptsize TESTINA} \\ \text{\scriptsize (DI LETTURA E SCRITTURA)}}}{\Delta}$ & \multicolumn{7}{c}{\scriptsize (Bi-infinito)}
+\end{tabular}
+\end{center}
+
+Ogni cella è predisposta per accogliere un simbolo.
+
+\vspace{0.4cm}
+$\Sigma \cup \{*\}$ Alfabeto.
+
+Ad ogni istante la macchina, in base a quello che legge e allo stato in cui si trova, può fare una di queste tre operazioni:
+\begin{itemize}
+    \item Sovrascrivere (aggiornare) il simbolo
+    \item Spostarsi (a destra o a sinistra)
+    \item Aggiornare lo stato
+\end{itemize}
+
+$Q$ insieme degli stati $\{q_0, q_1, q_2, \dots\}$
+
+\vspace{0.4cm}
+\textbf{Transizione} (singolo passo di calcolo/computazione):
+$$ ( \underbrace{q}_{\text{\scriptsize stato}}, \underbrace{X}_{\text{\scriptsize simbolo}}, \underbrace{\alpha}_{\text{\scriptsize azione}}, \underbrace{\tilde{q}}_{\text{\scriptsize stato di arrivo}} ) \in Q \times \Sigma \times (\Sigma \cup \{D, S\}) \times Q $$
+Dove $\alpha \in \Sigma \cup \{D, S\}$ indica:
+\begin{itemize}
+    \item $D, S$: passo a destra, passo a sinistra
+    \item Se $\alpha \in \Sigma$: scrivo sul nastro senza spostamento
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Configurazione:} È la coppia $(q, X)$, dove:
+\begin{itemize}
+    \item $q$ è lo stato in cui si trova la macchina
+    \item $X$ è la stringa che rappresenta il contenuto del nastro 
+\end{itemize}    
+
+\vspace{0.5cm}
+\textbf{Quartupla funzionale nei primi 2 argomenti:} Fissati i primi 2 argomenti (lo stato corrente e il simbolo letto), esiste al più una transizione. Questo garantisce che la macchina sia \textit{deterministica}.
+
+\vspace{0.4cm}
+\textbf{Definizione:} Una \textbf{Macchina di Turing} (MdT) è una lista di transizioni (cioè una lista di quadruple funzionali nei primi 2 argomenti).
+
+\newpage
+\textbf{Esempi}
+
+\textbf{1)}
+\begin{itemize}
+    \item[] $q_0 \ * \ D \ q_1$
+    \item[] $q_0 \ 1 \ D \ q_1$
+\end{itemize}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+& 1 & 1 & 1 & 1 & 1 & \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_0}}{\Delta}$} & \multicolumn{5}{c}{}
+\end{tabular}
+\end{center}
+\textit{Questa macchina fa solo un passo a destra e si ferma.}
+
+\vspace{0.6cm}
+\textbf{2)}
+\begin{itemize}
+    \item[] $q_0 \ * \ D \ q_0$
+    \item[] $q_0 \ 1 \ D \ q_1$
+    \item[] $q_1 \ 1 \ D \ q_1$
+\end{itemize}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+& * & * & 1 & 1 & 1 & & \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_0}}{\Delta}$} & \multicolumn{6}{c}{}
+\end{tabular}
+\end{center}
+\textit{Legge gli asterischi spostandosi a destra; quando trova un $1$, passa allo stato $q_1$ e continua a scorrere gli $1$ verso destra.}
+
+\vspace{0.6cm}
+\textbf{3)}
+\begin{itemize}
+    \item[] $q_0 \ * \ 1 \ q_0$
+    \item[] $q_0 \ 1 \ D \ q_1$
+    \item[] $q_1 \ * \ 1 \ q_1$
+    \item[] $q_1 \ 1 \ 1 \ q_0$
+\end{itemize}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+& 1 & 1 & & \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_0}}{\Delta}$} & \multicolumn{1}{c}{}
+\end{tabular}
+\end{center}
+\textit{Mette tutti $1$ e non termina mai. \\
+(Nota: si può scrivere anche come $q_0 \ * \ 1 \ q_0$ seguito da $q_0 \ 1 \ D \ q_0$, poiché per fare la stessa cosa ci possono essere più Macchine di Turing.}
+
+\vspace{0.6cm}
+\textbf{4) Funzione Successore}
+\begin{itemize}
+    \item[] $q_0 \ * \ D \ q_1$
+    \item[] $q_1 \ 1 \ D \ q_1$
+    \item[] $q_1 \ * \ 1 \ q_2$
+    \item[] $q_2 \ 1 \ S \ q_2$
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Definizione:} Una MdT $M$ \textbf{calcola una funzione} $f$ quando, fatta partire sulla cella vuota all'immediata sinistra dell'input, termina sulla cella vuota all'immediata sinistra dell'output.
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c}
+\hline
+\dots * & & * & & * & & \dots \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ \text{\scriptsize per calcolare } f \text{\scriptsize\ con più} \\ \text{\scriptsize parametri}}}{\Delta}$} & \multicolumn{5}{c}{}
+\end{tabular}
+\end{center}
+Cioè si inserisce degli * per delimitare i parametri.
+
+\vspace{0.6cm}
+\textbf{5) Funzione Somma}
+\begin{itemize}
+    \item[] $q_0 \ * \ D \ q_1$
+    \item[] $q_1 \ 1 \ D \ q_1$
+    \item[] $q_1 \ * \ 1 \ q_2$
+    \item[] $q_2 \ 1 \ D \ q_2$
+    \item[] $q_2 \ * \ S \ q_3$
+    \item[] $q_3 \ 1 \ * \ q_3$
+    \item[] $q_3 \ * \ S \ q_4$
+    \item[] $q_4 \ 1 \ * \ q_4$
+    \item[] $q_4 \ * \ S \ q_5$
+    \item[] $q_5 \ 1 \ S \ q_5$
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c}
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{3}{c}{$\overbrace{\hspace{2.5cm}}^{3}$} & \multicolumn{1}{c}{} & \multicolumn{2}{c}{$\overbrace{\hspace{1.5cm}}^{2}$} & \multicolumn{1}{c}{} \\
+\hline
+* & 1 & 1 & 1 & \textbf{1} & 1 & 1 & \textbf{*} & * \\
+\hline
+\multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_0}}{\Delta} \rightarrow \underset{\substack{\uparrow \\ q_1}}{\Delta}$} & \multicolumn{1}{c}{\dots} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_2}}{\Delta}$} & \multicolumn{1}{c}{\dots} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_4}}{\Delta}$} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_3}}{\Delta}$} & \multicolumn{1}{c}{}
+\end{tabular}
+\end{center}
+\textit{(Nota: La macchina scorre a destra trasformando l'asterisco centrale in un $1$, unendo così i due blocchi. Arrivata in fondo, cancella l'ultimo $1$ sostituendolo con un $*$ per mantenere la corretta decodifica unaria della somma, poi torna indietro fino all'asterisco iniziale per fermarsi).}
+
+\vspace{0.6cm}
+\textbf{Funzione $\tau$-ricorsiva:} Una funzione $f: \mathbb{N}^k \to \mathbb{N}$ si dice $\tau$-ricorsiva quando $\exists$ M MdT che calcola $f$.
+
+\vspace{0.4cm}
+\textbf{Tesi di Church (per funzioni $\tau$-ricorsive):} La classe delle funzioni computabili coincide con la classe delle funzioni $\tau$-ricorsive.
+
+\vspace{0.6cm}
+\textbf{Esercizio} \\
+Siano $f: \mathbb{N} \to \mathbb{N}$ rp, $R \subseteq \mathbb{N}^k$ rp (quindi $\chi_R$ è rp). \\
+Definisco $S \subseteq \mathbb{N}^k$ ponendo $\vec{x} \in S$ usando $(f(x_1), \dots, f(x_k)) \in R$. \\
+Dimostrare che $S$ è rp.
+
+\textit{Dimostrazione:}
+$$ \chi_S(\vec{x}) = \chi_R \circ (f \circ \mathcal{E}_1^{(k)}, \dots, f \circ \mathcal{E}_k^{(k)})(\vec{x}) $$
+Essendo $S$ definita tramite la composizione della funzione caratteristica di $R$ (che è rp per ipotesi) con una serie di composizioni di $f$ (rp per ipotesi) e le proiezioni (rp in quanto funzioni iniziali), la funzione $\chi_S$ è ottenuta per composizione di funzioni rp, ed è quindi essa stessa rp. Di conseguenza, l'insieme $S$ è rp.
