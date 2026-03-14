@@ -1097,3 +1097,614 @@ Dimostrare che $S$ è rp.
 \textit{Dimostrazione:}
 $$ \chi_S(\vec{x}) = \chi_R \circ (f \circ \mathcal{E}_1^{(k)}, \dots, f \circ \mathcal{E}_k^{(k)})(\vec{x}) $$
 Essendo $S$ definita tramite la composizione della funzione caratteristica di $R$ (che è rp per ipotesi) con una serie di composizioni di $f$ (rp per ipotesi) e le proiezioni (rp in quanto funzioni iniziali), la funzione $\chi_S$ è ottenuta per composizione di funzioni rp, ed è quindi essa stessa rp. Di conseguenza, l'insieme $S$ è rp.
+
+
+
+
+
+%9/3/2026:
+
+\vspace{0.6cm}
+\textbf{6) MDT che, data una stringa su $\{a, b\}$, scambia le $a$ con le $b$}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c}
+\hline
+\dots & * & a & b & a & a & b & \dots & \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ \Delta}}{\phantom{*}}$} & \multicolumn{7}{c}{} \\
+\end{tabular}
+$\leadsto$
+\begin{tabular}{c|c|c|c|c|c|c|c|c}
+\hline
+\dots & * & b & a & b & b & a & * & \dots \\
+\hline
+\multicolumn{7}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ \Delta}}{\phantom{*}}$} & \multicolumn{1}{c}{} \\
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt, node distance=2.5cm, on grid, auto, thick]
+   \node[state, initial, initial text=] (q_0)   {$q_0$};
+   \node[state] (q_1) [right=of q_0] {$q_1$};
+   \node[state] (q_2) [right=of q_1] {$q_2$};
+   
+   \path[->]
+    (q_0) edge node {$*/D$} (q_1)
+    (q_1) edge[bend left] node[above] {$\substack{b/a \\ a/b}$} (q_2)
+    (q_2) edge[bend left] node[below] {$a,b/D$} (q_1);
+\end{tikzpicture}
+\quad\quad
+\begin{minipage}{5cm}
+\centering
+\scriptsize Rappresentazione grafica di una MDT:\\
+\vspace{0.2cm}
+\begin{tikzpicture}[shorten >=1pt, node distance=2cm, on grid, auto, thick]
+   \node[state] (q)   {$q$};
+   \node[state] (q_tilde) [right=of q] {$\tilde{q}$};
+   \path[->] (q) edge node {$X/\alpha$} (q_tilde);
+\end{tikzpicture}
+\end{minipage}
+\end{center}
+
+\vspace{0.6cm}
+\textbf{7) MDT che scrive la copia di una stringa unaria}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c}
+\hline
+\dots & * & 1 & 1 & 1 & 1 & * & \dots & \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ \Delta \\ q_0}}{\phantom{*}}$} & \multicolumn{7}{c}{} \\
+\end{tabular}
+$\leadsto$
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|c}
+\hline
+\dots & * & 1 & 1 & 1 & 1 & * & 1 & 1 & 1 & 1 & * & \dots \\
+\hline
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ \Delta \\ q_5}}{\phantom{*}}$} & \multicolumn{11}{c}{} \\
+\end{tabular}
+\end{center}
+\textit{Nota: si utilizza un simbolo aggiuntivo (di lavoro) $X$ per indicare la copia di un $1$.}
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt, node distance=2.5cm, on grid, auto, thick]
+   \node[state, initial, initial text=] (q_0)   {$q_0$};
+   \node[state] (q_1) [right=of q_0] {$q_1$};
+   \node[state] (q_2) [below right=of q_1] {$q_2$};
+   \node[state] (q_3) [below left=of q_2] {$q_3$};
+   \node[state] (q_4) [above left=of q_3] {$q_4$};
+   \node[state] (q_5) [above right=of q_1] {$q_5$};
+   
+   \path[->]
+    (q_0) edge node {$*/D$} (q_1)
+    (q_1) edge node {$1/X$} (q_2)
+    (q_1) edge node {$*/S$} (q_5)
+    (q_2) edge[loop right] node {$1/D$} (q_2)
+    (q_2) edge node {$*/D$} (q_3)
+    (q_3) edge[loop right] node {$1/D$} (q_3)
+    (q_3) edge node {$*/1$} (q_4)
+    (q_4) edge[loop left] node {$\substack{1/S \\ */S}$} (q_4)
+    (q_4) edge node {$X/D$} (q_1)
+    (q_5) edge[loop right] node {$\substack{X/1 \\ 1/S}$} (q_5);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.6cm}
+\subsubsection{Macchine di Turing come accettatori di linguaggi}
+Sia $Q$ l'insieme degli stati di una MDT e $F \subseteq Q$ l'insieme degli stati finali.
+
+\textbf{Definizione:} Una macchina $M$ accetta la stringa $w$ per stati finali quando l'esecuzione di $M$ su input $w$ termina in uno stato finale.
+
+\textbf{Definizione:} Un linguaggio $L \subseteq \Sigma^*$ si dice accettato per stati finali da una MDT $M$ quando: $w \in L \iff M \text{ accetta } w \text{ per stati finali}$. In questo caso si scrive $L = L(M)$.
+
+\textbf{Definizione:} Se $L$ è tale che $\exists M$ MDT per cui $L = L(M)$, l'insieme $L$ si dice \textbf{ricorsivamente enumerabile}.
+
+\textbf{Osservazione:} Se $M$ è una MDT che termina su ogni input, allora $L(M)$ si dice \textbf{ricorsivo}.
+
+\vspace{0.4cm}
+\textit{Via Tesi di Church:} \\
+ricorsivamente enumerabile $\iff$ semidecidibile \\
+ricorsivo $\iff$ decidibile
+
+\vspace{1 cm}
+\textbf{Esempio 1) MDT che accetta il linguaggio $(a|b)^* aa (a|b)^*$}
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt, node distance=2.5cm, on grid, auto, thick]
+   \node[state, initial, initial text=] (q_0)   {$q_0$};
+   \node[state] (q_1) [right=of q_0] {$q_1$};
+   \node[state] (q_2) [right=of q_1] {$q_2$};
+   \node[state, accepting] (q_3) [right=of q_2] {$q_3$};
+   
+   \path[->]
+    (q_0) edge node {$*/D$} (q_1)
+    (q_1) edge[loop below] node {$b/D$} (q_1)
+    (q_1) edge[bend left] node {$a/D$} (q_2)
+    (q_2) edge[bend left] node {$b/D$} (q_1)
+    (q_2) edge node {$a/a$} (q_3);
+\end{tikzpicture}
+\qquad $Q = \{q_0, q_1, q_2, q_3\}$, \quad $F = \{q_3\}$
+\end{center}
+
+\newpage
+\vspace{0.4cm}
+\textbf{Esempio 2) MDT che accetta il linguaggio $\{a^i b^i c^i \mid i \ge 0\} \subseteq \{a,b,c\}^*$}
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt, node distance=2.2cm, on grid, auto, thick]
+   \node[state, initial, initial text=] (q_0)   {$q_0$};
+   \node[state] (q_1) [right=of q_0] {$q_1$};
+   \node[state] (q_2) [right=of q_1] {$q_2$};
+   \node[state] (q_3) [right=of q_2] {$q_3$};
+   \node[state] (q_4) [right=of q_3] {$q_4$};
+   \node[state] (q_5) [right=of q_4] {$q_5$};
+   
+   \node[state] (q_6) [below=of q_5, yshift=-0.5cm] {$q_6$};
+   \node[state] (q_7) [below=of q_1, yshift=-0.5cm] {$q_7$};
+   \node[state, accepting] (q_8) [left=of q_7] {$q_8$};
+   
+   \path[->]
+    (q_0) edge node {$*/D$} (q_1)
+    (q_1) edge[loop above] node {$a/X$} (q_1)
+    (q_1) edge node {$X/D$} (q_2)
+    (q_2) edge[loop above] node {$a,Y/D$} (q_2)
+    (q_2) edge node {$b/Y$} (q_3)
+    (q_3) edge node {$Y/D$} (q_4)
+    (q_4) edge[loop above] node {$b,Z/D$} (q_4)
+    (q_4) edge node {$c/Z$} (q_5)
+    (q_5) edge node[right] {$Z/S$} (q_6) % Aggiunto logicamente, nel disegno è vuoto
+    (q_6) edge[loop below] node {$a,b,Y,Z/S$} (q_6)
+    (q_6) edge node[below] {$X/D$} (q_1)
+    (q_1) edge node[right] {$Y/D$} (q_7)
+    (q_7) edge[loop right] node {$Y,Z/D$} (q_7)
+    (q_7) edge node[above] {$*/*$} (q_8)
+    (q_1) edge node[above left] {$*/*$} (q_8);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.6 cm}
+\textbf{Definizione:} Una MDT $M$ accetta $w$ \textbf{per arresto} quando $M$, eseguita su $w$, termina.
+
+\vspace{0.4 cm}
+\textbf{Definizione:} L'insieme delle stringhe accettate da $M$ per arresto è il linguaggio accettato da $M$ per arresto.
+
+\vspace{0.3 cm}
+\textbf{Proposizione:} Sia $L$ un linguaggio. $\exists M$ MDT che accetti $L$ per stati finali $\iff \exists N$ MDT che accetta $L$ per arresto.
+
+\textit{Dimostrazione:}
+\begin{itemize}
+    \item[$\impliedby$)] Sia $N$ una MDT che accetta $L$ per arresto. La MDT $M$ ottenuta da $N$ designando ogni stato come stato finale è una MDT che accetta $L$ per stati finali.
+    
+    \item[$\implies$)] Sia $M$ una MDT che accetta $L$ per stati finali. Su input $w$:
+    \begin{itemize}
+        \item $M$ termina in uno stato finale (selezionando $Q$ = stati di $M$, $F$ = stati finali di $M$)
+        \item $M$ termina in uno stato non finale
+        \item $M$ non termina
+    \end{itemize}
+    Costruiamo la MDT $N$ in questo modo: $N$ ha le stesse transizioni di $M$, più le seguenti: $\forall q \in Q \setminus F$, $\forall x \in \Sigma$ tali che non ci sono transizioni di $M$ con configurazione $(q, x)$, aggiungiamo le transizioni $q \xrightarrow{x/x} \tilde{q}$ e $\tilde{q} \xrightarrow{x/x} \tilde{q}$ (dove $\tilde{q}$ è un nuovo stato in cui la macchina "cicla" all'infinito senza mai fermarsi).
+    \begin{center}
+    \begin{tikzpicture}[shorten >=1pt, node distance=2cm, on grid, auto, thick]
+       \node[state] (q)   {$q$};
+       \node[state] (q_tilde) [right=of q] {$\tilde{q}$};
+       \path[->] 
+        (q) edge node {$x/x$} (q_tilde)
+        (q_tilde) edge[loop right] node {$x/x$} (q_tilde);
+    \end{tikzpicture}
+    \end{center}
+\end{itemize}
+
+\vspace{0.6cm}
+\textbf{Esercizi} \\
+\textbf{1)} $L$ è accettato per un unico stato finale quando $\exists M$ MDT con un solo stato finale che accetta $L$. Dimostrare che $L$ è accettato per stati finali $\iff$ è accettato per un unico stato finale.
+
+\textit{Dimostrazione:}
+\begin{itemize}
+    \item[$\impliedby$)] Ovvio.
+    \item[$\implies$)] Sia $M$ una MDT che accetta $L$ per stati finali. Costruiamo $N$ aggiungendo un nuovo stato $\tilde{q}$, che $M$ raggiungerà ogni volta che termina in uno stato finale (inoltre $\tilde{q}$ sarà l'unico stato finale di $N$).
+\end{itemize}
+
+\textbf{2)} $M$ accetta $w$ \textbf{per ingresso} quando, durante l'esecuzione di $M$ su $w$, la MDT entra in uno stato finale. Un linguaggio $L$ è accettato da $M$ per ingresso quando $\exists M$ MDT che accetta tutte e sole le stringhe di $L$ per ingresso. Dimostrare che $L$ è accettato per stati finali $\iff L$ è accettato per ingresso.
+
+\textit{Dimostrazione:}
+\begin{itemize}
+    \item[$\implies$)] Sia $M$ una MDT che accetta $L$ per stati finali. $M'$ che accetta per ingresso si costruisce a partire da $M$ aggiungendo un nuovo stato $\tilde{q}$ (che sarà l'ultimo stato finale) e transizioni che portano in $\tilde{q}$ da ogni stato finale in corrispondenza a caratteri per cui non ci sono transizioni uscenti in $M$.
+    \item[$\impliedby$)] Sia $M$ una MDT che accetta $L$ per ingresso. $M'$ MDT che accetta $L$ per stati finali si ottiene da $M$ eliminando tutte le transizioni uscenti dagli stati finali.
+\end{itemize}
+
+
+
+
+%11/3/2026
+
+\vspace{0.6cm}
+\subsubsection{Varianti di Macchine di Turing}
+\vspace{0.6cm}
+\textbf{MDT multitraccia:} Ha $\Sigma$ alfabeto, $Q$ insieme degli stati e una lista di transizioni della forma:
+$$ (q, (x_1, \dots, x_k), \alpha, \tilde{q}) \in Q \times \Sigma^k \times (\Sigma^k \cup \{D, S\}) \times Q $$
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|}
+\cline{2-9}
+\multirow{4}{*}{$K$ tracce $\left\{\begin{array}{c} \\ \\ \\ \\ \end{array}\right.$} 
+& & * & & \multicolumn{4}{c|}{\multirow{3}{*}{\Huge $*$}} & \\
+\cline{2-4} \cline{9-9}
+& & * & & \multicolumn{4}{c|}{} & \\
+\cline{2-4} \cline{9-9}
+& & * & & \multicolumn{4}{c|}{} & \\
+\cline{2-9}
+& & * & $a_1$ & $a_2$ & $a_3$ & $\dots$ & $a_K$ & \\
+\cline{2-9}
+\multicolumn{2}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ \Delta}}{\phantom{*}}$} & \multicolumn{6}{c}{}
+\end{tabular}
+\end{center}
+
+\textbf{Proposizione:} Fissato $K \in \mathbb{N}$, $L$ è accettato da una MDT a una traccia $\iff L$ è accettato da una MDT a $K$ tracce.
+
+\textit{Dimostrazione:}
+\begin{itemize}
+    \item[$\implies$)] Ovvio (posso simulare una MDT con una traccia, usando una MDT con il contenuto di $K$ tracce vuote, tranne la prima).
+    \item[$\impliedby$)] Sia $M$ una MDT a $K$ tracce che accetta $L$. 
+    Posso ottenere una MDT $M'$ che accetta $L$ a una traccia semplicemente sostituendo l'alfabeto $\Sigma$ di $M$ con l'alfabeto esteso $\Sigma^K$ (le cui lettere sono di fatto $K$-uple), ed eseguendo le stesse transizioni.
+\end{itemize}
+
+\vspace{0.8cm}
+\textbf{MDT limitata a sinistra:}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+* & $a_1$ & \dots & $a_n$ & \dots \\
+\hline
+\multicolumn{5}{c}{$\underset{\substack{\uparrow \\ \Delta}}{\phantom{*}}$} \\
+\end{tabular}
+\end{center}
+Possiamo usare una MDT limitata a sinistra per accettare stringhe nello stesso modo di quelle classiche, con l'accortezza che un'operazione di spostamento a sinistra a partire dalla prima cella causa il rifiuto della stringa.
+
+\vspace{0.6cm}
+\textbf{Proposizione:} $L$ accettato da una MDT classica $\iff L$ accettato da una MDT limitata a sinistra.
+
+\textit{Idea di Dimostrazione:}
+\begin{itemize}
+    \item[$\impliedby$)] \textbf{Da Limitata a Classica:} Sia $M$ una MDT limitata a sinistra che accetta $L$. Vogliamo simularla con una MDT classica (a nastro bi-infinito). La macchina classica farà le stesse identiche cose, ma posizionerà un simbolo speciale (ad esempio $\#$) nella cella di partenza (indice 0). Se durante la computazione la macchina legge questo simbolo e riceve l'istruzione di spostarsi a sinistra, saprà che la mossa è "illegale" e rifiuterà la stringa, simulando esattamente il blocco della macchina limitata.
+
+    \item[$\implies$)] \textbf{Da Classica a Limitata:} Sia $M$ una MDT classica che accetta $L$. Immaginiamo di numerare le celle del suo nastro infinito partendo dalla cella di partenza come indice $0$ (avremo celle positive a destra $1, 2, 3 \dots$ e negative a sinistra $-1, -2, -3 \dots$). 
+    Creiamo una MDT limitata a sinistra dotata di \textbf{2 tracce}, che funziona come se avessimo "piegato a metà" il nastro originale proprio sullo zero:
+    
+    \begin{center}
+    \begin{tabular}{c|c|c|c|c|c|c}
+    \multicolumn{1}{c}{} & \multicolumn{1}{c}{\scriptsize -0} & \multicolumn{1}{c}{\scriptsize -1} & \multicolumn{1}{c}{\scriptsize -2} & \multicolumn{1}{c}{\scriptsize -3} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} \\
+    \hline
+    \textbf{Traccia 2 (indici negativi)} $\rightarrow$ & & & & & & \dots \\
+    \hline
+    \textbf{Traccia 1 (indici $\ge 0$)} $\rightarrow$ & * & $a_1$ & $a_2$ & $a_3$ & & \dots \\
+    \hline
+    \multicolumn{1}{c}{} & \multicolumn{1}{c}{\scriptsize 0} & \multicolumn{1}{c}{\scriptsize 1} & \multicolumn{1}{c}{\scriptsize 2} & \multicolumn{1}{c}{\scriptsize 3} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} \\
+    \end{tabular}
+    \end{center}
+    
+    La nuova macchina replica il comportamento di $M$ per le celle $\ge 0$ operando sulla prima traccia (quella inferiore). Quando la macchina originale cercherebbe di passare a sinistra dello $0$ (verso gli indici negativi), la nostra nuova macchina passa a operare sulla seconda traccia (quella superiore) e \textbf{inverte gli spostamenti}: poiché il nastro è ripiegato, un passo a "sinistra" della macchina originale diventa un passo a "destra" sulla nostra traccia ripiegata, e viceversa.
+\end{itemize}
+
+\textbf{NB:} MDT standard $\iff$ MDT limitata a sinistra.
+
+
+\vspace{0.8cm}
+\textbf{MDT multinastro:} Opera su $K$ nastri, ciascuno dotato della propria testina di lettura/scrittura. Le $K$ testine possono operare e muoversi in modo totalmente indipendente l'una dall'altra.
+Una transizione di una MDT multinastro è della forma:
+$$ (q, (x_1, \dots, x_k), (\alpha_1, \dots, \alpha_k), \tilde{q}) \in Q \times \Sigma^K \times (\Sigma \cup \{D, S\})^K \times Q $$
+
+\textbf{Proposizione:} $L$ accettato da una MDT standard $\iff L$ accettato da una MDT multinastro.
+
+\textit{Dimostrazione:}
+\begin{itemize}
+    \item[$\implies$)] Ovvio (basta ignorare i nastri in eccesso).
+    \item[$\impliedby$)] Sia $M$ una MDT a $K$ nastri che accetta $L$. Facciamo vedere che $\exists$ una MDT $M'$ a $2K+1$ tracce che accetta $L$. Più precisamente facciamo vedere che ogni singola transizione di una computazione di $M$ può essere simulata da un gruppetto di transizioni di $M'$ (usando una traccia per il contenuto di ogni nastro e una traccia ausiliaria per marcare la posizione di ogni singola testina).
+\end{itemize}
+
+\vspace{0.6cm}
+\textbf{Transizioni di $M'$ (Simulazione di una MDT a $K$ nastri con una a $2K+1$ tracce):}
+
+Esempio con $K=2$: La MDT $M$ ha 2 nastri indipendenti, quindi la MDT $M'$ che la simula avrà $2(2)+1 = 5$ tracce.
+
+\begin{center}
+    \begin{tikzpicture}[scale=0.85, every node/.style={transform shape}]
+        
+        % ================= M (2 Nastri) =================
+        \node at (2.5, 5) {\large \textbf{$M$ (2 Nastri)}};
+        
+        % Nastro 2 (Sopra)
+        \node[left] at (0, 3.5) {2};
+        \draw[thick] (0,3) grid (5,4);
+        \draw[thick] (5,3) -- (6,3); \draw[thick] (5,4) -- (6,4);
+        \node at (4.5, 3.5) {*};
+        \node at (5.5, 3.5) {\dots};
+        
+        % Freccia movimento nastro 2
+        \draw[->, thick] (3.8, 4.2) -- (2.8, 4.2);
+        
+        % Nastro 1 (Sotto)
+        \node[left] at (0, 1.5) {1};
+        \draw[thick] (0,1) grid (5,2);
+        \draw[thick] (5,1) -- (6,1); \draw[thick] (5,2) -- (6,2);
+        \node at (2.5, 1.5) {a};
+        \node at (5.5, 1.5) {\dots};
+        
+        % Freccia movimento nastro 1
+        \draw[->, thick] (2.2, 2.2) -- (3.2, 2.2);
+        
+        % Testina e Stato
+        \node at (0.5, 0.6) {$\Delta$};
+        \node at (0.5, 0.1) {$q \leadsto \tilde{q}$};
+        
+        % Linee curve di lettura (dalla testina alle celle)
+        % Per il nastro 1 (sotto)
+        \draw[->, thick] (0.6, 0.8) .. controls (0.8, 0.4) and (2.5, 0.4) .. (2.5, 1);
+        % Per il nastro 2 (sopra)
+        \draw[->, thick] (0.4, 0.8) .. controls (0, 2.5) and (3.5, 2.5) .. (3.5, 3);
+    
+        % ================= Freccia centrale =================
+        \node at (7, 2.5) {\LARGE $\leadsto$};
+    
+        % ================= M' (5 Tracce) =================
+        \begin{scope}[shift={(9,0)}]
+            \node at (3, 7) {\large \textbf{$M'$ (5 Tracce)}};
+            
+            % Etichette tracce
+            \node[left] at (0, 1.5) {1};
+            \node[left] at (0, 2.5) {2};
+            \node[left] at (0, 3.5) {3};
+            \node[left] at (0, 4.5) {4};
+            \node[left] at (0, 5.5) {5};
+            
+            % Griglia 5 tracce
+            \draw[thick] (0,1) grid (6,6);
+            \draw[thick] (6,1) -- (7,1);
+            \draw[thick] (6,2) -- (7,2);
+            \draw[thick] (6,3) -- (7,3);
+            \draw[thick] (6,4) -- (7,4);
+            \draw[thick] (6,5) -- (7,5);
+            \draw[thick] (6,6) -- (7,6);
+            
+            % Contenuto celle
+            \node at (0.5, 5.5) {\#};
+            
+            \node at (4.5, 4.5) {X};
+            \node at (4.5, 3.5) {*};
+            
+            \node at (2.5, 2.5) {X};
+            \node at (2.5, 1.5) {a};
+            
+            % Testina M' (perfettamente sotto la colonna del #)
+            \node at (0.5, 0.6) {$\Delta$};
+            \node at (0.5, 0.1) {$\tilde{q}$};
+            
+            % Tupla stato
+            \node at (4.5, 0.5) {$(q, a, *)$};
+        \end{scope}
+    \end{tikzpicture}
+    \end{center}
+
+\vspace{0.4cm}
+\textbf{Come funziona la simulazione (su $M'$):}
+\begin{itemize}
+    \item La prima cosa che fa è inserire un simbolo speciale (\#) nell'ultima traccia (la traccia 5) per marcare l'inizio.
+    \item La prima traccia viene usata per il contenuto del primo nastro.
+    \item La terza traccia viene usata per il contenuto del secondo nastro.
+    \item La seconda e la quarta traccia memorizzano la posizione delle rispettive testine (segnando una $X$ nella colonna in cui si troverebbe la testina).
+    \item Per eseguire una transizione, parto sempre con la testina all'inizio (sul \#).
+    \item Scorro in avanti, guardo la $X$ di traccia 2 e memorizzo il simbolo associato in traccia 1 (in questo caso $a$).
+    \item Torno indietro fino al \# e faccio la stessa cosa per il secondo nastro (cercando la $X$ in traccia 4 per memorizzare il simbolo in traccia 3).
+    \item Torno di nuovo all'inizio, e poi faccio le scritture e il movimento della $X$ allo stesso modo (sempre andando avanti e indietro a partire dal \#).
+\end{itemize}
+
+\textit{Nota: Per memorizzare i simboli letti durante questi passaggi, l'idea è utilizzare la memoria interna degli stati. Definiamo gli stati di $M'$ come tuple, ad esempio $(q, a, *)$, che "ricordano" sia lo stato originale $q$ in cui ci si trovava, sia i simboli appena letti.}
+
+
+
+\textbf{Esempio: MDT a 3 nastri che decide il linguaggio (su $\{a\}$) $\{a^K \mid K \text{ è un quadrato perfetto}\}$}
+
+\begin{center}
+\begin{tabular}{ll|c|c|c|c|c|c|c|c}
+\cline{3-10}
+Nastro 1 ($K$): & \qquad & & $X$ & $X$ & \multicolumn{5}{c}{} \\
+\cline{3-10}
+\multicolumn{10}{c}{} \\
+\cline{3-10}
+Nastro 2 ($K^2$): & \qquad & & $X$ & $X$ & $X$ & $X$ & \multicolumn{3}{c}{} \\
+\cline{3-10}
+\multicolumn{10}{c}{} \\
+\cline{3-10}
+Nastro 3 (Input): & \qquad & * & $a$ & $a$ & $a$ & $a$ & $a$ & $a$ & \dots \\
+\cline{3-10}
+\multicolumn{2}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ \Delta}}{\phantom{*}}$} & \multicolumn{7}{c}{} \\
+\end{tabular}
+\end{center}
+
+\textit{Logica matematica per l'aggiornamento: } $K^2 \leadsto (K+1)^2 = K^2 + 2K + 1$
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt, node distance=2.5cm and 3cm, on grid, auto, thick, scale=0.9, transform shape]
+       \node[state, initial, initial text=] (q_0)   {$q_0$};
+       \node[state] (q_1) [right=of q_0] {$q_1$};
+       \node[state] (q_2) [right=of q_1] {$q_2$};
+       \node[state, accepting] (q_3) [right=of q_2] {$q_3$};
+       
+       \node[state] (q_4) [below=of q_2] {$q_4$};
+       \node[state] (q_5) [below=of q_4] {$q_5$};
+       \node[state] (q_6) [below=of q_5] {$q_6$};
+       
+       \node[state] (q_7) [left=of q_6] {$q_7$};
+       \node[state] (q_8) [left=of q_7] {$q_8$};
+       
+       \node[state] (q_9) [left=of q_5] {$q_9$};
+       \node[state] (q_10) [left=of q_9] {$q_{10}$};
+    
+       \path[->]
+        (q_0) edge node {$***/DDD$} (q_1)
+        (q_1) edge node {$a**/aXX$} (q_2)
+        (q_2) edge node {$**X/**X$} (q_3)
+        (q_2) edge[loop above] node {$aXX/DDX$} (q_2)
+        (q_2) edge node[right] {$a*X/aXX$} (q_4)
+        (q_4) edge node[right] {$aXX/aDX$} (q_5)
+        (q_5) edge node[right] {$a*X/aXX$} (q_6)
+        (q_6) edge node[below] {$aXX/aDX$} (q_7)
+        (q_7) edge node[below] {$a*X/aXX$} (q_8)
+        
+        % Freccia diagonale da q8 a q5: sloped per seguire la linea
+        (q_8) edge node[above, sloped, pos=0.4] {$aXX/aDD$} (q_5)
+        
+        (q_5) edge node[above] {$a**/a*X$} (q_9)
+        (q_9) edge node[above] {$a*X/SSS$} (q_10)
+        
+        % SOLUZIONE: loop left anziché loop below per evitare l'impatto con q_8
+        (q_10) edge[loop left] node[align=center] {$aXX/SSS$ \\ $aX*/SS*$ \\ $a**/S**$ \\ $*X*/*S*$} (q_10)
+        
+        % Freccia diagonale lunga da q10 a q2: sloped e spostata
+        (q_10) edge node[above, sloped, pos=0.35] {$***/DDD$} (q_2);
+        
+    \end{tikzpicture}
+    \end{center}
+
+
+
+
+%12/3/2026
+\vspace{0.8cm}
+\subsection{MDT Non Deterministica}
+
+\textbf{Definizione:} Una MDT si dice \textbf{non deterministica} quando le transizioni non sono necessariamente funzionali nei primi 2 argomenti. (Ovvero, a parità di stato e simbolo letto, la macchina può avere più scelte su cosa fare).
+
+\vspace{0.4cm}
+\textbf{Osservazione:} Le MDT deterministiche (= standard) sono MDT non deterministiche (ovvero, con una sola scelta per ogni configurazione).
+
+\vspace{0.4cm}
+\textbf{Definizione:} Data una stringa $w$ e una MDT non deterministica $M$, diciamo che $M$ accetta $w$ quando \textbf{esiste} (almeno) una computazione di $M$ che accetta $w$.
+\begin{center}
+\begin{tikzpicture}[baseline=-0.5ex]
+  \node (w) at (0,0) {$w$};
+  \draw[thick, decoration={snake, amplitude=.4mm, segment length=2mm, post length=1mm}, decorate] (w) -- (1.2, 0.4);
+  \draw[thick, decoration={snake, amplitude=.4mm, segment length=2mm, post length=1mm}, decorate] (w) -- (1.2, 0.15);
+  \draw[thick, decoration={snake, amplitude=.4mm, segment length=2mm, post length=1mm}, decorate] (w) -- (1.5, 0) node[right, fill=yellow!30, inner sep=1pt, draw=orange] {\tiny OK};
+  \draw[thick, decoration={snake, amplitude=.4mm, segment length=2mm, post length=1mm}, decorate] (w) -- (1.2, -0.15);
+  \draw[thick, decoration={snake, amplitude=.4mm, segment length=2mm, post length=1mm}, decorate] (w) -- (1.2, -0.4);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{Esempio:} 
+\begin{align*}
+    L = \{w \in \{a,b,c\}^* \mid \;& \exists \text{ un'occorrenza di 'c' immediatamente preceduta da } ab \text{ (abc)} \\
+    &\text{oppure immediatamente seguita da } ab \text{ (cab)}\}
+\end{align*}
+
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt, node distance=2.2cm, on grid, auto, thick, scale=0.9, transform shape]
+   \node[state, initial, initial text=] (q_0)   {$q_0$};
+   \node[state] (q_1) [right=of q_0] {$q_1$};
+   \node[state] (q_2) [right=of q_1] {$q_2$};
+   \node[state] (q_3) [right=of q_2] {$q_3$};
+   \node[state, accepting] (q_4) [right=of q_3] {$q_4$};
+   
+   \node[state] (q_5) [below=of q_1] {$q_5$};
+   \node[state] (q_6) [right=of q_5] {$q_6$};
+   \node[state, accepting] (q_7) [right=of q_6] {$q_7$};
+
+   \path[->]
+    (q_0) edge node {$*/D$} (q_1)
+    (q_1) edge[loop above] node {$a,b,c/D$} (q_1)
+    (q_1) edge node {$c/D$} (q_2)
+    (q_2) edge node {$a/D$} (q_3)
+    (q_3) edge node {$b/b$} (q_4)
+    (q_1) edge node[left] {$c/S$} (q_5)
+    (q_5) edge node[below] {$b/S$} (q_6)
+    (q_6) edge node[below] {$a/a$} (q_7);
+    
+    % Annotazioni
+    \node[orange, above=1cm of q_4, align=center] {Ho trovato \\ (cab)};
+    \node[orange, right=2cm of q_7, align=center] {$\longleftarrow$ ho trovato \\ (abc)};
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+    * & a & b & a & a & c & b & a & b & c & a & a & b & \dots \\
+    \hline
+    \multicolumn{7}{c}{} & \multicolumn{3}{c}{$\underbrace{\hspace{1.2cm}}_{\text{(abc)}}$} & \multicolumn{4}{c}{} \\
+    \end{tabular}
+    \end{center}
+
+\vspace{0.4cm}
+\textbf{Grado di non determinismo di $M$:} Data $M$ MDT non deterministica, il suo grado di non determinismo $\delta$ è il massimo numero di scelte possibili per una singola configurazione:
+$$ \delta = \max_{\substack{\tilde{q} \in Q \\ \tilde{x} \in \Sigma}} |\{ \tilde{q} \tilde{x} \alpha q \mid \alpha \in \Sigma \cup \{D, S\}, q \in Q \}| $$
+
+Dato $q \in Q, x \in \Sigma$ codifichiamo le transizioni di $M$ (MDT non deterministica) aventi $qx$ come primi 2 elementi utilizzando gli interi da $1$ a $\delta$, possibilmente codificando la stessa transizione con più etichette.
+\begin{itemize}
+    \item $q_1 \ c \ D \ q_1 \ : \ 1$ \quad \quad $q_1 \ a \ D \ q_1 \ : \ 1, 2, 3$
+    \item $q_1 \ c \ D \ q_2 \ : \ 2$
+    \item $q_1 \ c \ S \ q_5 \ : \ 3$
+\end{itemize}
+
+\textbf{Esempi di possibili computazioni sulla stringa $w = acab$:}
+\begin{enumerate}
+    \item $1111$, termina in uno stato non finale ($w$ \textit{non accettata})
+    \item $11211$, termina in uno stato finale ($w$ \textbf{accettata})
+    \item $22322$, termina subito ($w$ \textit{non accettata})
+\end{enumerate}
+
+\vspace{0.6cm}
+\textbf{Proposizione:} $L$ è accettato da una MDT standard $\iff L$ è accettato da una MDT non deterministica.
+
+\textit{Dimostrazione:}
+\begin{itemize}
+    \item[$\implies$)] Sia $M$ una MDT standard che accetta $L$. Poiché ogni MDT deterministica è (banalmente) anche una MDT non deterministica, $L$ è accettato da una MDT non deterministica.
+    \item[$\impliedby$)] Sia $M$ una MDT non deterministica che accetta $L$ per arresto, con grado di non determinismo di $M = \delta$. Descriviamo una MDT \textit{deterministica} che accetta $L$ per arresto a 3 nastri (per simulare tutte le computazioni parallele di $M$ in modo sistematico):
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{ll|c|c|c|c|c|l}
+\cline{3-7}
+3 & & $m_1$ & * & $m_2$ & * & $\dots$ & Generazione delle computazioni di $M$ ($1 \le m_i \le \delta$) \\
+\cline{3-7}
+\multicolumn{8}{c}{} \\
+\cline{3-7}
+2 & & * & \multicolumn{4}{c|}{\scriptsize copio l'input ed eseguo $(m_1,\dots,m_K)$} & Simulazione delle computazioni di $M$ \\
+\cline{3-7}
+\multicolumn{8}{c}{} \\
+\cline{3-7}
+1 & & \multicolumn{5}{c|}{} & Input \\
+\cline{3-7}
+\end{tabular}
+\end{center}
+
+\vspace{0.8cm}
+\subsection{Funzioni Parziali Computabili}
+
+\textbf{Funzione parziale:} Dati $A, B$ insiemi, una funzione parziale da $A$ a $B$ è una funzione da $D$ a $B$, per qualche dominio $D \subseteq A$.
+
+\vspace{0.4cm}
+\textbf{Funzione parziale computabile:} Data una funzione parziale $f$ da $A$ a $B$, si dice computabile quando $\exists M$ algoritmo tale che $\forall x \in A$:
+\begin{itemize}
+    \item Se $x \in \text{Dominio}(f)$, $M$ eseguita su $x$ restituisce in output $f(x)$ $\longrightarrow$ $x \in \text{Dominio}(f)$: $f$ converge su $x$, si scrive \textbf{$f(x)\downarrow$}
+    \item Se $x \notin \text{Dominio}(f)$, $M$ su $x$ non termina $\longrightarrow$ $x \notin \text{Dominio}(f)$: $f$ diverge su $x$, si scrive \textbf{$f(x)\uparrow$}
+\end{itemize}
+
+Lavoriamo su $\mathbb{N}$ in codifica unaria.
+
+\textbf{Definizione:} $f$ funzione parziale da $\mathbb{N}^k \to \mathbb{N}$ si dice \textbf{parziale $\tau$-ricorsiva} quando $\exists M$ MDT che, $\forall \vec{x} \in \mathbb{N}^k$:
+\begin{itemize}
+    \item Se $f(\vec{x})\downarrow$ allora l'esecuzione di $M$ su $\vec{x}$ termina con $f(\vec{x})+1$ "uni" sul nastro.
+    \item Se $f(\vec{x})\uparrow$ allora l'esecuzione di $M$ su $\vec{x}$ non termina su $\vec{x}$.
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Tesi di Church per funzioni parziali $\tau$-ricorsive:} La classe delle funzioni parziali computabili coincide con la classe delle funzioni parziali $\tau$-ricorsive.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\forall M$ MDT deterministica, $\forall K \in \mathbb{N} \ \exists!$ funzione parziale computabile $f: \mathbb{N}^k \to \mathbb{N}$ tale che $M$ calcola $f$.
+
+\textit{Dimostrazione:}
+Definisco $f$ funzione parziale da $\mathbb{N}^k$ in $\mathbb{N}$ come segue: \\
+$\forall \vec{x} \in \mathbb{N}^k$, eseguo $M$ su $\vec{x}$:
+\begin{itemize}
+    \item Se $M$ termina, $f(\vec{x})$ è data in unario dal numero di "uni" che si trovano sul nastro al termine dell'esecuzione.
+    \item Se $M$ non termina, $f(\vec{x})\uparrow$. Questo ci dice che ad ogni $M$ corrisponde (in modo univoco) una funzione $f$ ($M \longleftrightarrow f$).
+\end{itemize}
