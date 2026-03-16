@@ -1730,3 +1730,191 @@ $\forall \vec{x} \in \mathbb{N}^k$, eseguo $M$ su $\vec{x}$:
     \item Se $M$ termina, $f(\vec{x})$ è data in unario dal numero di "uni" che si trovano sul nastro al termine dell'esecuzione.
     \item Se $M$ non termina, $f(\vec{x})\uparrow$. Questo ci dice che ad ogni $M$ corrisponde (in modo univoco) una funzione $f$ ($M \longleftrightarrow f$).
 \end{itemize}
+
+
+
+
+
+
+
+%16/03/2026
+\subsection{Enumerazione e Problema dell'Arresto}
+
+\subsubsection{Codifica ed Enumerazione delle MDT}
+% Qui ci va la Prop: L'insieme delle MDT è enumerabile, le regole di codifica, l'esempio e l'algoritmo di enumerazione.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} L'insieme delle Macchine di Turing (MDT) è enumerabile.
+
+\vspace{0.2cm}
+\textit{Dimostrazione:} Possiamo codificare ogni Macchina di Turing come una stringa binaria.
+
+Dato l'insieme degli stati $Q = \{q_0, q_1, q_2, \dots\}$ finito, associamo:
+$$q_i \leadsto \underbrace{11\dots1}_{i+1} \quad \text{codifica}$$
+
+Dato l'alfabeto $\Sigma = \{a_0, a_1, a_2, \dots, a_n\}$, associamo:
+$$a_i \leadsto \underbrace{11\dots1}_{i+1}$$
+
+Per i movimenti della testina:
+$$D \leadsto \underbrace{11\dots1}_{n+2}$$
+$$S \leadsto \underbrace{11\dots1}_{n+3}$$
+
+La \textbf{transizione} generica $q_h \ a_i \ \alpha \ q_k$ (dove $\alpha$ è $a_j$ oppure $D$ oppure $S$) si codifica concatenando le sequenze di '1' separate da uno '0':
+$$q_h \ a_i \ \alpha \ q_k \leadsto \underbrace{11\dots1}_{h+1} 0 \underbrace{11\dots1}_{i+1} 0 \underbrace{11\dots1}_{?} 0 \underbrace{11\dots1}_{k+1}$$
+
+\vspace{0.4cm}
+\textbf{Lista delle transizioni:} 
+Per rappresentare l'intera macchina, concateniamo le singole transizioni (Tr.) separandole con "00" e terminando la stringa con "000":
+$$ \text{"Transizione 1"} \ 00 \ \text{"Transizione 2"} \ 00 \ \dots \ 00 \ \text{"Transizione } z\text{"} \ 000 $$
+
+\textit{Nota:} Il "000" finale segnala che finisce la codifica. Questa struttura binaria valida per qualsiasi Macchina di Turing è utile se si vuole dare in pasto ad un'altra Macchina di Turing.
+
+\vspace{0.4cm}
+\textbf{Esempio di codifica:}
+Date le seguenti transizioni:
+\begin{align*}
+    q_0 \ &* \ D \ q_0 \\
+    q_0 \ &1 \ D \ q_1 \\
+    q_1 \ &1 \ S \ q_1
+\end{align*}
+Traducendo i simboli secondo le regole (assumendo $1 \leadsto 1, * \leadsto 11$ e ricordando che $D \leadsto 111, S \leadsto 1111$), le singole transizioni diventano:
+\begin{itemize}
+    \item $q_0 \ * \ D \ q_0 \implies 1 \ 0 \ 11 \ 0 \ 111 \ 0 \ 1$
+    \item $q_0 \ 1 \ D \ q_1 \implies 1 \ 0 \ 1 \ 0 \ 111 \ 0 \ 11$
+    \item $q_1 \ 1 \ S \ q_1 \implies 11 \ 0 \ 1 \ 0 \ 1111 \ 0 \ 11$
+\end{itemize}
+Come buona prassi per delimitare chiaramente il codice (specialmente se dato in input a una Macchina Universale), apriamo e chiudiamo l'intera stringa con "000":
+$$ 000 \ 1011011101 \ 00 \ 1010111011 \ 00 \ 110101111011 \ 000 $$
+
+\vspace{0.8cm}
+\textbf{Algoritmo di enumerazione per le MDT:}
+Genera in ordine lessicografico e per lunghezza crescente tutte le stringhe su $\{0, 1\}$.
+Per ognuna di esse faccio un controllo sintattico e, se rappresenta una MDT, la scrivo.
+\textit{(Esempio: per la sintassi, controlla che cominci con uno $0$ e poi ci deve essere un $1$).}
+
+Otteniamo così una sequenza ordinata:
+$$ M_1, \ M_2, \ M_3, \dots, \ M_n, \dots $$
+Dove $M_n$ è la $n$-esima Macchina di Turing generata da questo algoritmo di enumerazione. Ad ogni macchina corrisponde una funzione:
+$$ f_1, \ f_2, \ f_3, \dots, \ f_n, \dots $$
+Questa è la lista delle funzioni parziali computabili unarie.
+
+\vspace{0.6cm}
+\subsubsection{L'Insieme K e l'Indecidibilità}
+% Qui ci va il Teorema su K, la dimostrazione per assurdo, il Problema dell'Arresto, la Gödelizzazione, il grafico di Eulero-Venn e L_HALT.
+
+\textbf{Teorema:} Definiamo l'insieme $K$:
+$$ K = \{a \in \mathbb{N} \mid M_a \text{ termina su } a\} = \{a \in \mathbb{N} \mid f_a(a)\downarrow\} $$
+Il quale rispetta le seguenti proprietà:
+\begin{enumerate}
+    \item $K$ è semidecidibile.
+    \item $K$ non è decidibile.
+\end{enumerate}
+
+\vspace{0.4cm}
+\textit{Dimostrazione 1 (Algoritmo di semidecisione per $K$):}
+Dato $a \in \mathbb{N}$, uso l'algoritmo di enumerazione per ottenere la macchina $M_a$, ed eseguo $M_a$ su $a$.
+Se $M_a$ termina, allora $a \in K$. 
+(Altrimenti non lo so dire se $a \notin K$, il che implica che è semidecidibile).
+
+\vspace{0.4cm}
+\textit{Dimostrazione 2 :}
+Supponiamo per assurdo che $K$ sia decidibile, cioè abbiamo un algoritmo di decisione per $K$.
+Definiamo una funzione $f: \mathbb{N} \to \mathbb{N}$ come segue:
+$$ 
+f(n) = \begin{cases} 
+f_n(n) + 1 & , \ n \in K \\
+0 & , \ n \notin K 
+\end{cases} 
+$$
+
+\textbf{Osservazione su $f$:} $f$ è computabile. 
+Come lo calcolo in pratica? Uso l'algoritmo di decisione per $K$: dato $n \in \mathbb{N}$, decido se $n \in K$. Se sì, calcolo $f_n(n) + 1$; se no, scrivo $0$.
+
+Dunque $f$ deve comparire nella lista delle funzioni computabili unarie, cioè:
+$$ \exists \bar{n} \in \mathbb{N} : \quad f = f_{\bar{n}} $$
+
+Calcolo ora $f(\bar{n})$ per valutare i due casi possibili:
+\begin{itemize}
+    \item Se $\bar{n} \in K$: per definizione $f(\bar{n}) = f_{\bar{n}}(\bar{n}) + 1$. Ma sapendo che $f = f_{\bar{n}}$, avremmo che $f_{\bar{n}}(\bar{n}) + 1 = f_{\bar{n}}(\bar{n})$. 
+    \textbf{Assurdo!} (Un numero naturale non può essere uguale al suo successore).
+    
+    \item Se $\bar{n} \notin K$: per definizione di $f$, avremmo $f(\bar{n}) = 0$.
+    Ma se $\bar{n} \notin K$, significa (per definizione di $K$) che la macchina non termina, quindi $f_{\bar{n}}(\bar{n})\uparrow$ (diverge).
+    Essendo $f = f_{\bar{n}}$, avremmo che un valore definito ($0$) è uguale a qualcosa che non termina.
+    \textbf{Assurdo!}
+\end{itemize}
+Queste due situazioni incompatibili portano ad un assurdo $\implies$ l'assunto che $K$ sia decidibile è falso.
+
+\vspace{0.8cm}
+\textbf{Problema dell'arresto}
+Data una MDT $M$ e un numero naturale $n$, determinare se $M$ su $n$ termina.
+
+\vspace{0.4cm}
+\textbf{Teorema (dell'arresto):} (Il problema dell'arresto è indecidibile)
+L'insieme $R = \{(n, m) \in \mathbb{N}^2 \mid M_n \text{ termina su } m\}$ è semidecidibile, ma non è decidibile.
+
+\textit{Dimostrazione intuitiva:} Se, per assurdo, $R$ fosse decidibile, allora potrei decidere, in particolare, se $(n, n) \in R$ (per ogni $n \in \mathbb{N}$). Ma tale "sottoproblema" è equivalente al problema di decisione per $K$, che non è decidibile come abbiamo appena dimostrato.
+
+\vspace{0.4cm}
+\textbf{Enunciato equivalente del problema dell'arresto:}
+Data $M$ MDT e $w$ stringa, determinare se $M$ termina su $w$.
+Sono equivalenti perché si riduce al fatto che ogni numero naturale si può codificare come stringa su un opportuno alfabeto, e ogni stringa su un alfabeto può essere codificata da un numero naturale.
+
+\vspace{0.8cm}
+\textbf{Funzione di Gödelizzazione}
+Dato $\Sigma = \{a_1, a_2, a_3, \dots\}$, definiamo la funzione $\ddot{g}: \Sigma^* \to \mathbb{N}$:
+$$ \ddot{g}(a_{i_1} a_{i_2} \dots a_{i_n}) \mapsto P_1^{i_1+1} \cdot P_2^{i_2+1} \dots P_n^{i_n+1} $$
+Dove $P = \{P_1, P_2, \dots\} = \{2, 3, 5, \dots\}$ è l'insieme dei numeri primi in ordine crescente.
+
+Proprietà di $\ddot{g}$:
+\begin{itemize}
+    \item $\ddot{g}$ è computabile.
+    \item $\ddot{g}$ è iniettiva.
+    \item L'immagine $\ddot{g}(\Sigma^*)$ è decidibile.
+    \item Se $m \in \ddot{g}(\Sigma^*)$, esiste un algoritmo per calcolare $w \in \Sigma^*$ tale che $\ddot{g}(w) = m$.
+\end{itemize}
+
+\vspace{0.4cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.9, transform shape]
+    % Sfondo (Tutti i problemi / Universo)
+    \filldraw[fill=gray!5, draw=gray, rounded corners, thick] (-1.5, -1) rectangle (7.5, 5.5);
+    \node[anchor=north west, text=gray!80!black, font=\footnotesize\bfseries] at (-1.5, 5.5) {Tutti i problemi};
+    
+    % Cerchio Semi-decidibili (Arancione)
+    \filldraw[fill=orange!15, draw=orange, thick] (2.5, 2) ellipse (3.5cm and 2.5cm);
+    \node[text=orange!90!black, font=\footnotesize\bfseries] at (2.5, 4) {Semi-decidibili};
+    
+    % Cerchio Decidibili (Azzurro)
+    \filldraw[fill=cyan!15, draw=cyan, thick] (2.5, 1.5) ellipse (1.8cm and 1.2cm);
+    \node[text=cyan!90!black, font=\footnotesize\bfseries] at (2.5, 1.5) {Decidibili};
+
+        % Etichetta generale "Non Decidibili" (tutto ciò che è fuori dal cerchio azzurro)
+        \node[text=red!80!black, font=\footnotesize\bfseries, align=center] at (6, 4.5) {NON \\ DECIDIBILI};
+        \draw[->, red!80!black, dashed, shorten >=2pt] (5.2, 4.3) -- (4, 3.5); % Punta alla ciambella
+        \draw[->, red!80!black, dashed, shorten >=2pt] (6, 3.9) -- (6, 2.5);   % Punta allo spazio esterno
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{Definizione:} Il linguaggio del problema dell'arresto (o linguaggio dell'arresto) è definito come:
+$$ L_{HALT} = \{R(M)w \mid M \text{ termina su } w\} $$
+Dove $R(M)$ è la codifica binaria di $M$, concatenata con la stringa $w$.
+
+\vspace{0.4cm}
+\textbf{Osservazione:} Il problema dell'arresto è il problema di decisione per $L_{HALT}$ (data una stringa, verificare se appartiene a $L_{HALT}$).
+
+\vspace{0.4cm}
+\textbf{Teorema dell'arresto:} $L_{HALT}$ è semidecidibile, ma non decidibile.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} Il complemento $L_{HALT}^C$ non è semidecidibile.
+(Le stringhe sintatticamente scorrette o corrette ma dove $M$ non termina).
+
+\vspace{0.2cm}
+\textit{Dimostrazione:} Per assurdo, supponiamo che $L_{HALT}^C$ sia semidecidibile.
+Sappiamo già che $L_{HALT}$ è semidecidibile.
+Per il Teorema di Post (se un linguaggio e il suo complemento sono entrambi semidecidibili, allora il linguaggio è decidibile), questo implicherebbe che:
+$$ \implies L_{HALT} \text{ è decidibile} $$
+\textbf{Assurdo!} (Abbiamo appena dimostrato che non lo è).
