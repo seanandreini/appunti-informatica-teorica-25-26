@@ -1059,16 +1059,15 @@ Cioè si inserisce degli * per delimitare i parametri.
 \vspace{0.6cm}
 \textbf{5) Funzione Somma}
 \begin{itemize}
-    \item[] $q_0 \ * \ D \ q_1$
-    \item[] $q_1 \ 1 \ D \ q_1$
-    \item[] $q_1 \ * \ 1 \ q_2$
+    \item[] $q_0 \ * \ D \ q_1$ 
+    \item[] $q_1 \ 1 \ D \ q_1$ 
+    \item[] $q_1 \ * \ 1 \ q_2$ 
     \item[] $q_2 \ 1 \ D \ q_2$
-    \item[] $q_2 \ * \ S \ q_3$
-    \item[] $q_3 \ 1 \ * \ q_3$
+    \item[] $q_2 \ * \ S \ q_3$ 
     \item[] $q_3 \ * \ S \ q_4$
     \item[] $q_4 \ 1 \ * \ q_4$
-    \item[] $q_4 \ * \ S \ q_5$
-    \item[] $q_5 \ 1 \ S \ q_5$
+    \item[] $q_4 \ * \ S \ q_5$ 
+    \item[] $q_5 \ 1 \ S \ q_5$ 
 \end{itemize}
 
 \begin{center}
@@ -1080,7 +1079,7 @@ Cioè si inserisce degli * per delimitare i parametri.
 \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_0}}{\Delta} \rightarrow \underset{\substack{\uparrow \\ q_1}}{\Delta}$} & \multicolumn{1}{c}{\dots} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_2}}{\Delta}$} & \multicolumn{1}{c}{\dots} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_4}}{\Delta}$} & \multicolumn{1}{c}{$\underset{\substack{\uparrow \\ q_3}}{\Delta}$} & \multicolumn{1}{c}{}
 \end{tabular}
 \end{center}
-\textit{(Nota: La macchina scorre a destra trasformando l'asterisco centrale in un $1$, unendo così i due blocchi. Arrivata in fondo, cancella l'ultimo $1$ sostituendolo con un $*$ per mantenere la corretta decodifica unaria della somma, poi torna indietro fino all'asterisco iniziale per fermarsi).}
+\textit{(Nota: La macchina scorre a destra trasformando l'asterisco centrale in un $1$, unendo così i due blocchi. Arrivata in fondo, cancella gli ultimi due $1$ sostituendoli con degli $*$ per compensare l'eccesso della codifica unaria e mantenere il risultato corretto della somma. Infine, torna all'indietro fino all'asterisco iniziale per fermarsi).}
 
 \vspace{0.6cm}
 \textbf{Funzione $\tau$-ricorsiva:} Una funzione $f: \mathbb{N}^k \to \mathbb{N}$ si dice $\tau$-ricorsiva quando $\exists$ M MdT che calcola $f$.
@@ -1189,16 +1188,23 @@ $\leadsto$
 \end{tikzpicture}
 \end{center}
 
+\textit{(Nota: la macchina legge un $1$, lo sostituisce con una $X$ e scorre a destra. Salta l'asterisco separatore e gli eventuali $1$ già copiati, fino a trovare la prima cella vuota ($*$) dove scrive un $1$. Poi torna indietro verso sinistra fino a ritrovare la $X$ per ripetere il processo. Quando non ci sono più $1$ da copiare, la macchina entra nella fase di ripristino: scorre verso sinistra sostituendo ogni $X$ con un $1$ per ricreare l'input originale, finché non incontra l'asterisco iniziale, dove si ferma definitivamente).}
+
+
 \vspace{0.6cm}
 \subsubsection{Macchine di Turing come accettatori di linguaggi}
 Sia $Q$ l'insieme degli stati di una MDT e $F \subseteq Q$ l'insieme degli stati finali.
 
+\vspace{0.4cm}
 \textbf{Definizione:} Una macchina $M$ accetta la stringa $w$ per stati finali quando l'esecuzione di $M$ su input $w$ termina in uno stato finale.
+\vspace{0.4cm}
 
 \textbf{Definizione:} Un linguaggio $L \subseteq \Sigma^*$ si dice accettato per stati finali da una MDT $M$ quando: $w \in L \iff M \text{ accetta } w \text{ per stati finali}$. In questo caso si scrive $L = L(M)$.
 
+\vspace{0.4cm}
 \textbf{Definizione:} Se $L$ è tale che $\exists M$ MDT per cui $L = L(M)$, l'insieme $L$ si dice \textbf{ricorsivamente enumerabile}.
 
+\vspace{0.4cm}
 \textbf{Osservazione:} Se $M$ è una MDT che termina su ogni input, allora $L(M)$ si dice \textbf{ricorsivo}.
 
 \vspace{0.4cm}
@@ -1226,8 +1232,9 @@ ricorsivo $\iff$ decidibile
 \qquad $Q = \{q_0, q_1, q_2, q_3\}$, \quad $F = \{q_3\}$
 \end{center}
 
-\newpage
-\vspace{0.4cm}
+\textit{(Nota: la macchina, dopo aver trovato due $a$ consecutive, entra nello stato finale $q_3$ e si ferma, accettando così la stringa a prescindere da quello che c'è dopo le due $a$).}
+
+\vspace{0.6cm}
 \textbf{Esempio 2) MDT che accetta il linguaggio $\{a^i b^i c^i \mid i \ge 0\} \subseteq \{a,b,c\}^*$}
 
 \begin{center}
@@ -1262,8 +1269,18 @@ ricorsivo $\iff$ decidibile
 \end{tikzpicture}
 \end{center}
 
+\vspace{0.4cm}
+\textit{Nota esplicativa sul funzionamento: \\
+La macchina non potendo "contare" la lunghezza $i$, procede accoppiando i simboli a tre a tre tramite passate successive, utilizzando i simboli ausiliari $X, Y, Z$ come marcatori. 
+\begin{itemize}
+    \item \textbf{Ciclo di marcatura ($q_1 \to q_6$):} Partendo da sinistra, la macchina legge la prima $a$ disponibile e la marca scrivendo $X$. Scorre a destra saltando le $a$ e le $Y$ ($q_2$), trova la prima $b$ e la marca con $Y$ ($q_3$). Scorre ancora a destra saltando le $b$ e le $Z$ ($q_4$), trova la prima $c$ e la marca con $Z$ ($q_5$). A questo punto inverte la marcia ($q_6$) e torna tutta a sinistra fino a sbattere contro l'ultima $X$ scritta, per poi fare un passo a destra e ricominciare un nuovo ciclo.
+    \item \textbf{Fase di verifica ($q_7$):} Quando in $q_1$ la macchina legge una $Y$ invece di una $a$, significa che le $a$ sono finite. Entra quindi in fase di verifica ($q_7$): scorre tutto il nastro a destra assicurandosi che siano rimaste solo $Y$ e $Z$ (nessuna $b$ o $c$ in eccesso). 
+    \item \textbf{Accettazione ($q_8$):} Se arriva in fondo leggendo solo marcatori e incontra l'asterisco finale ($*$), la stringa è perfettamente bilanciata e viene accettata per arresto nello stato finale $q_8$. La transizione $q_1 \xrightarrow{*/*} q_8$ serve invece per accettare la stringa vuota (caso $i=0$).
+\end{itemize}}
+
+
 \vspace{0.6 cm}
-\textbf{Definizione:} Una MDT $M$ accetta $w$ \textbf{per arresto} quando $M$, eseguita su $w$, termina.
+\textbf{Definizione:} Una MDT $M$ accetta $w$ \textbf{per arresto} quando $M$, eseguita su $w$, termina. (in qualsiasi stato).
 
 \vspace{0.4 cm}
 \textbf{Definizione:} L'insieme delle stringhe accettate da $M$ per arresto è il linguaggio accettato da $M$ per arresto.
@@ -1338,6 +1355,10 @@ $$ (q, (x_1, \dots, x_k), \alpha, \tilde{q}) \in Q \times \Sigma^k \times (\Sigm
 \end{tabular}
 \end{center}
 
+Cioè la testina legge un vettore di k simboli.
+
+\vspace{0.4cm}
+
 \textbf{Proposizione:} Fissato $K \in \mathbb{N}$, $L$ è accettato da una MDT a una traccia $\iff L$ è accettato da una MDT a $K$ tracce.
 
 \textit{Dimostrazione:}
@@ -1347,7 +1368,7 @@ $$ (q, (x_1, \dots, x_k), \alpha, \tilde{q}) \in Q \times \Sigma^k \times (\Sigm
     Posso ottenere una MDT $M'$ che accetta $L$ a una traccia semplicemente sostituendo l'alfabeto $\Sigma$ di $M$ con l'alfabeto esteso $\Sigma^K$ (le cui lettere sono di fatto $K$-uple), ed eseguendo le stesse transizioni.
 \end{itemize}
 
-\vspace{0.8cm}
+\newpage
 \textbf{MDT limitata a sinistra:}
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|}
@@ -1357,6 +1378,7 @@ $$ (q, (x_1, \dots, x_k), \alpha, \tilde{q}) \in Q \times \Sigma^k \times (\Sigm
 \multicolumn{5}{c}{$\underset{\substack{\uparrow \\ \Delta}}{\phantom{*}}$} \\
 \end{tabular}
 \end{center}
+
 Possiamo usare una MDT limitata a sinistra per accettare stringhe nello stesso modo di quelle classiche, con l'accortezza che un'operazione di spostamento a sinistra a partire dalla prima cella causa il rifiuto della stringa.
 
 \vspace{0.6cm}
@@ -1499,7 +1521,7 @@ Esempio con $K=2$: La MDT $M$ ha 2 nastri indipendenti, quindi la MDT $M'$ che l
 \textit{Nota: Per memorizzare i simboli letti durante questi passaggi, l'idea è utilizzare la memoria interna degli stati. Definiamo gli stati di $M'$ come tuple, ad esempio $(q, a, *)$, che "ricordano" sia lo stato originale $q$ in cui ci si trovava, sia i simboli appena letti.}
 
 
-
+\vspace{0.6cm}
 \textbf{Esempio: MDT a 3 nastri che decide il linguaggio (su $\{a\}$) $\{a^K \mid K \text{ è un quadrato perfetto}\}$}
 
 \begin{center}
@@ -1678,7 +1700,7 @@ Dato $q \in Q, x \in \Sigma$ codifichiamo le transizioni di $M$ (MDT non determi
 \vspace{0.8cm}
 \subsection{Funzioni Parziali Computabili}
 
-\textbf{Funzione parziale:} Dati $A, B$ insiemi, una funzione parziale da $A$ a $B$ è una funzione da $D$ a $B$, per qualche dominio $D \subseteq A$.
+\textbf{Funzione parziale:} Dati $A, B$ insiemi, una funzione parziale da $A$ a $B$ è una funzione da $D$ a $B$, per qualche dominio $D \subseteq A$. \textit{(Cioè potrebbe essere definita solo su una parte di $A$, ad es. $f(x) = \frac{10}{x}$, che non è definita per $x=0$).}
 
 \vspace{0.4cm}
 \textbf{Funzione parziale computabile:} Data una funzione parziale $f$ da $A$ a $B$, si dice computabile quando $\exists M$ algoritmo tale che $\forall x \in A$:
