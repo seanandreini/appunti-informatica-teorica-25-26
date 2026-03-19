@@ -1918,3 +1918,202 @@ Sappiamo già che $L_{HALT}$ è semidecidibile.
 Per il Teorema di Post (se un linguaggio e il suo complemento sono entrambi semidecidibili, allora il linguaggio è decidibile), questo implicherebbe che:
 $$ \implies L_{HALT} \text{ è decidibile} $$
 \textbf{Assurdo!} (Abbiamo appena dimostrato che non lo è).
+
+
+
+
+
+
+
+
+
+
+
+%18/03/2026
+\vspace{0.8cm}
+\subsection{Macchina Universale e Riducibilità}
+
+\textbf{Definizione:} Una \textbf{MDT Universale} è una Macchina di Turing che, su input $R(M)w$, simula l'esecuzione di $M$ su $w$.
+
+\vspace{0.2cm}
+\textbf{Proposizione:} Esiste una MDT Universale che calcola le funzioni parziali computabili unarie.
+
+\vspace{0.6cm}
+\textbf{Definizione (Riduzione tra linguaggi):} Dati $L_1, L_2$ linguaggi, con $L_1 \subseteq \Sigma_1^*$ e $L_2 \subseteq \Sigma_2^*$, diciamo che \textbf{$L_1$ è riducibile a $L_2$} quando:
+$$ \exists f: \Sigma_1^* \to \Sigma_2^* \quad \text{tale che:} $$
+\begin{enumerate}
+    \item $f$ è computabile (esiste una MDT che la calcola).
+    \item $\forall w \in \Sigma_1^*, \quad w \in L_1 \iff f(w) \in L_2$ .
+\end{enumerate}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, transform shape]
+    % Insieme Sigma 1
+    \draw[gray, thick] (0,0) ellipse (1.2cm and 1.5cm);
+    \node[gray] at (0, 1.2) {$\Sigma_1^*$};
+    \draw[gray] (0,-0.2) circle (0.6cm);
+    \node[gray] at (0, 0.1) {$L_1$};
+    \filldraw[black] (0,-0.4) circle (1.5pt) node[anchor=east] {$w$};
+    
+    % Insieme Sigma 2
+    \draw[gray, thick] (4,0) ellipse (1.2cm and 1.5cm);
+    \node[gray] at (4, 1.2) {$\Sigma_2^*$};
+    \draw[gray] (4,-0.2) circle (0.6cm);
+    \node[gray] at (4, 0.1) {$L_2$};
+    \filldraw[black] (4,-0.4) circle (1.5pt) node[anchor=west] {$f(w)$};
+    
+    % Frecce di mappatura
+    \draw[->, thick, bend right=20] (0.1,-0.4) to node[below] {$f$} (3.9,-0.4);
+    \draw[->, gray, bend right=30] (0.5,-1) to (3.5,-1);
+\end{tikzpicture}
+\end{center}
+
+La funzione $f$ si dice \textbf{funzione di riduzione} da $L_1$ a $L_2$.
+
+\vspace{0.4cm}
+\textbf{Proposizione (Molto utile per dimostrare la decidibilità):}
+\begin{enumerate}
+    \item Se abbiamo $f$ riduzione da $L_1$ a $L_2$: \\
+    Se $L_2$ è decidibile $\implies L_1$ è decidibile.
+    \item Se abbiamo $f$ riduzione da $L_1$ a $L_2$: \\
+    Se $L_1$ è indecidibile $\implies L_2$ è indecidibile.
+\end{enumerate}
+
+\vspace{0.2cm}
+\textit{Dimostrazione del punto 1:}
+Siano $F$ la MDT che calcola la funzione $f$, e $M_2$ la MDT che decide il linguaggio $L_2$.
+Devo costruire una MDT che decide $L_1$.
+Se ho in input $w \in \Sigma_1^*$:
+\begin{itemize}
+    \item Uso $F$ per calcolare la trasformazione $f(w) \in \Sigma_2^*$.
+    \item Uso $M_2$ dandogli in pasto $f(w)$ per decidere se $f(w) \in L_2$.
+\end{itemize}
+Se $M_2$ accetta, allora $w \in L_1$. Se $M_2$ rifiuta, allora $w \notin L_1$. Dunque $L_1$ è decidibile.
+
+\vspace{0.6cm}
+\textbf{Esempio 1:}
+Siano i linguaggi:
+$$ L_1 = \{uu \mid u = a^i b^i c^i, \ i \ge 0\} \subseteq \{a,b,c\}^* $$
+$$ L_2 = \{a^i b^i c^i \mid i \ge 0\} \subseteq \{a,b,c\}^* \quad \text{(Sappiamo già che è decidibile)} $$
+Sia $M_2$ la MDT che decide $L_2$. 
+Vogliamo costruire una MDT che calcoli una riduzione da $L_1$ a $L_2$. 
+Presa in input una stringa $w \in \{a,b,c\}^*$:
+\begin{itemize}
+    \item Controlliamo se $w = uu$, per qualche sottostringa $u \in \{a,b,c\}^*$.
+    \item Se \underline{non} è così, cancello tutto $w$ e scrivo $a$ sul nastro (che sicuramente non sta in $L_2$, facendola rifiutare).
+    \item Se $w = uu$, cancello la seconda metà di $w$, ottenendo sul nastro solo $u$.
+\end{itemize}
+
+\vspace{0.6cm}
+\textbf{Esempio 2:}
+Siano gli alfabeti $\Sigma_1 = \{x, y\}$ e $\Sigma_2 = \{a\}$.
+$$ L_1 = \{(xy)^n \mid n \ge 0\} \subseteq \Sigma_1^* $$
+$$ L_2 = \{a^{2n} \mid n \ge 0\} \subseteq \Sigma_2^* $$
+Ecco il diagramma degli stati della MDT che implementa la riduzione da $L_1$ a $L_2$ (trasformando le sequenze $xy$ in stringhe di $a$ di lunghezza pari):
+
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt, on grid, auto, thick]
+       
+       % --- IL NASTRO ---
+       \node[draw, rectangle, thick, minimum height=0.6cm, inner sep=6pt, font=\ttfamily] (tape) at (4, 2.5) {* x y x y x y x y \dots};
+    
+       % --- I NODI ---
+       \node[state, initial, initial text=] (q_0) at (0, 0) {$q_0$};
+       \node[state] (q_1) at (2.5, 0) {$q_1$};
+       \node[state] (q_2) at (5.5, 0) {$q_2$};
+       \node[state] (q_3) at (2.5, -3) {$q_3$};
+       \node[state] (q_4) at (8.5, 0) {$q_4$};
+       \node[state] (q_5) at (12, 0) {$q_5$};
+       \node[state] (q_6) at (12, -2.5) {$q_6$};
+       \node[state] (q_7) at (9.5, -4.5) {$q_7$};
+       \node[state] (q_8) at (12.5, -5.5) {$q_8$};
+    
+       % --- GLI ARCHI ---
+       \path[->]
+        % Partenza
+        (q_0) edge node {$*/D$} (q_1)
+        
+        % Ciclo di lettura corretto xy
+        (q_1) edge[bend left=30] node {$x/D$} (q_2)
+        (q_2) edge[bend left=30] node {$y/D$} (q_1)
+        
+        % Ramo di SUCCESSO (Torna indietro scrivendo 'a')
+        (q_1) edge node[left] {$*/S$} (q_3)
+        (q_3) edge[loop left] node[align=center] {$x, y / a$ \\ $a / S$} (q_3)
+        
+        % Ramo degli ERRORI (Fast-forward verso destra)
+        % 1. Errore in q1 (legge y) 
+        (q_1) edge[out=-60, in=-120, min distance=2.5cm] node[below] {$y/D$} (q_4)
+        % 2. Errori in q2 (legge x oppure *)
+        (q_2) edge[bend left=30] node[above] {$x/D$} (q_4)
+        (q_2) edge[bend right=15] node[below] {$*/D$} (q_4)
+        
+        % Gestione dell'errore (Vai a dx fino alla fine, poi rimbalza a sx)
+        (q_4) edge[loop above] node {$x, y / D$} (q_4)
+        (q_4) edge node {$*/S$} (q_5)
+        
+        % Ciclo di cancellazione stringa (all'indietro verso sx)
+        (q_5) edge[bend right=40] node[left] {$x, y / *$} (q_6)
+        (q_6) edge[bend right=40] node[right] {$* / S$} (q_5)
+        
+        % Uscita dalla cancellazione e scrittura della 'a' singola (dispari = rifiuto)
+        (q_5) edge[out=230, in=110] node[left] {$*/D$} (q_7)
+        (q_7) edge[loop left] node {$* / a$} (q_7)
+        (q_7) edge[bend right=15] node[below] {$a / S$} (q_8);
+    
+    \end{tikzpicture}
+    \end{center}
+
+\vspace{0.8cm}
+\subsubsection{Problema del Nastro Vuoto (BTP)}
+
+\textbf{Definizione (Blank Tape Problem):} Data una MDT $M$, determinare se l'esecuzione di $M$ termina partendo su un nastro completamente vuoto.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} Il BTP è \textbf{indecidibile}.
+
+\vspace{0.2cm}
+\textit{Dimostrazione:} Descriviamo una riduzione dal Problema dell'Arresto ($L_{HALT}$, che sappiamo essere indecidibile) al Problema del Nastro Vuoto ($L_{BTP}$).
+$$ L_{HALT} = \{R(M)w \mid M \text{ termina su } w\} $$
+$$ L_{BTP} = \{R(M) \mid M \text{ termina su nastro vuoto (ovvero su stringa } \varepsilon)\} $$
+
+Data una stringa $x$ in input:
+\begin{itemize}
+    \item Se $x$ \underline{non} è della forma $R(M)w$, restituisco $0$ (rifiuto subito).
+    \item Altrimenti, cioè se $x = R(M)w$, costruisco una nuova codifica $R(M')$ tale che la nuova macchina $M'$ operi come segue: \\
+    Su un input generico $y$:
+    \begin{enumerate}
+        \item Se $y \neq \varepsilon$, $M'$ si comporta esattamente come $M$.
+        \item Se $y = \varepsilon$, $M'$ per prima cosa scrive la stringa $w$ sul nastro, ed esegue $M$ su $w$.
+    \end{enumerate}
+\end{itemize}
+
+\textbf{Osservazione fondamentale:}
+\begin{itemize}
+    \item Se $M$ termina su $w \implies M'$ termina su $\varepsilon$.
+    \item Se $M$ non termina su $w \implies M'$ non termina su $\varepsilon$.
+\end{itemize}
+Dunque vale la doppia implicazione della riduzione:
+$$ R(M)w \in L_{HALT} \iff R(M') \in L_{BTP} $$
+Poiché $L_{HALT}$ è indecidibile e lo abbiamo ridotto a $L_{BTP}$, per la proposizione precedente anche $L_{BTP}$ deve essere indecidibile.
+
+\vspace{0.8cm}
+\subsubsection{Proprietà dei Linguaggi Semidecidibili}
+Restringendoci alla classe dei linguaggi semidecidibili, molti problemi decisionali risultano indecidibili. Definiamo i linguaggi associati ad alcune domande classiche sulle Macchine di Turing:
+
+\begin{itemize}
+    \item \textbf{La stringa vuota appartiene al linguaggio?}
+    $$ \{R(M) \mid \varepsilon \in L(M)\} $$
+    
+    \item \textbf{Il linguaggio è vuoto?}
+    $$ L_{\emptyset} = \{R(M) \mid L(M) = \emptyset\} $$
+    
+    \item \textbf{Il linguaggio è $\Sigma^*$?} (Cioè la macchina accetta tutte le stringhe)
+    $$ L_{\Sigma^*} = \{R(M) \mid L(M) = \Sigma^*\} $$
+    
+    \item \textbf{Il linguaggio è regolare?}
+    $$ L_{REG} = \{R(M) \mid L(M) \text{ è regolare}\} $$
+\end{itemize}
+
+In generale, data una generica proprietà $P$, si definisce il linguaggio:
+$$ L_P = \{R(M) \mid L(M) \text{ soddisfa la proprietà } P\} $$
