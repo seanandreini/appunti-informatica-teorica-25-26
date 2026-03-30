@@ -59,7 +59,7 @@ a_3 & a_3 a_1 & & a_3 a_2 & & \dots & & \\
 Usando il procedimento diagonale è possibile enumerare le parole e poi trovare un algoritmo di enumerazione per le stringhe.
 
 \vspace{0.4cm}
-\textbf{Attenzione:} $\mathcal{L} \text{ decidibile} \impliedby \mathcal{L} \text{ enumerabile}$ (NON vale il viceversa in generale). \\
+\textbf{Attenzione:} $\mathcal{L} \text{ decidibile} \nLeftarrow \mathcal{L} \text{ enumerabile}$ (IN GENERALE). \\
 MA vale la seguente...
 
 \vspace{0.4cm}
@@ -96,6 +96,7 @@ $$\mathcal{L} \text{ DECIDIBILE} \iff \mathcal{L} \text{ ENUMERABILE e } \mathca
     \item Se $w \in \mathcal{L}$, termina e accetta $w$.
     \item Se $w \notin \mathcal{L}$, non termina.
 \end{itemize}
+\textit{Nota pratica: Questa equivalenza è utilissima nelle dimostrazioni perché ci permette di assumere che esista un solo modo in cui la macchina fallisce (il loop infinito), togliendoci il dubbio che possa fermarsi per rifiutare.}
 
 \vspace{0.4cm}
 \textbf{Proposizione:}
@@ -535,7 +536,7 @@ Sia $g: \mathbb{N}^2 \to \mathbb{N}$ una funzione rp.
 \subsubsection{Relazioni ricorsive primitive}
 
 \textbf{Definizione:} Sia $R \subseteq \mathbb{N}^k$. Una funzione $f: \mathbb{N}^k \to \mathbb{N}$ si dice \textbf{BUONA per $R$} quando:
-$$ \forall\ \vec{x} \in \mathbb{N}^k, \quad f(\vec{x}) = 0 \iff \vec{x} \in R $$
+$$ \forall\ \vec{x} \in \mathbb{N}^k, \quad f(\vec{x}) = 0 \iff \vec{x} \in R \text{  (La relazione è soddisfatta)}$$ 
 
 \vspace{0.4cm}
 \textbf{Definizione:} $R \subseteq \mathbb{N}^k$ (relazione k-aria) si dice \textbf{RICORSIVA PRIMITIVA (rp)} quando:
@@ -2117,3 +2118,161 @@ Restringendoci alla classe dei linguaggi semidecidibili, molti problemi decision
 
 In generale, data una generica proprietà $P$, si definisce il linguaggio:
 $$ L_P = \{R(M) \mid L(M) \text{ soddisfa la proprietà } P\} $$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%26/3/2026
+\vspace{0.4cm}
+\textbf{Proposizione:} $L_{\Sigma^*}$ NON È DECIDIBILE.
+
+\textit{Dimostrazione:} Descriviamo una riduzione da $L_{HALT}$ a $L_{\Sigma^*}$, ovvero $R(M)w \leadsto R(M')$.
+Costruiamo la nuova macchina $M'$ in modo che, su un input generico $y$, si comporti così:
+\begin{enumerate}
+    \item Cancella $y$ dal nastro.
+    \item Scrive $w$.
+    \item Esegue $M$ su $w$.
+\end{enumerate}
+
+\textbf{Osservazione:}
+\begin{itemize}
+    \item Se $R(M)w \in L_{HALT}$ ($M$ termina su $w$) $\implies M'$ termina su qualsiasi $y$. Quindi $M'$ accetta tutte le stringhe: $R(M') \in L_{\Sigma^*}$.
+    \item Se $R(M)w \notin L_{HALT}$ ($M$ non termina su $w$) $\implies M'$ non termina su nessun $y$. Quindi $M'$ non accetta nulla: $R(M') \notin L_{\Sigma^*}$.
+\end{itemize}
+
+\vspace{0.4cm}
+
+\subsubsection{Il Teorema di Rice}
+
+\textbf{Definizione (Proprietà Banale):} Una proprietà $P$ si dice \textbf{BANALE} quando tutti i linguaggi semidecidibili soddisfano $P$, oppure nessun linguaggio semidecidibile soddisfa $P$.
+
+\vspace{0.2cm}
+\textbf{TEOREMA DI RICE:} Sia $P$ una proprietà \textbf{non banale}. Il linguaggio ad essa associato:
+$$ L_P = \{ R(M) \mid L(M) \text{ soddisfa } P \} \text{     NON È DECIDIBILE.}$$
+
+
+\textit{Nota pratica: Questo teorema sancisce che non esiste alcun algoritmo (strategia) capace di analizzare il codice di un programma per determinare se il suo comportamento (il suo linguaggio) possiede una specifica proprietà non banale.}
+
+
+\vspace{0.4cm}
+\textit{DIMOSTRAZIONE:} 
+Sia $P$ una proprietà NON banale. 
+
+\textbf{Caso 1: Supponiamo che $\emptyset$ (il linguaggio vuoto) NON soddisfi $P$.}
+Poiché $P$ è non banale, esiste almeno un linguaggio semidecidibile $L$ che soddisfa $P$ (quindi $L \neq \emptyset$). Sia $M_L$ la Macchina di Turing che accetta $L$.
+Descriviamo una riduzione da $L_{HALT}$ a $L_P$: $R(M)w \leadsto R(M')$.
+\vspace{0.2cm}
+\textbf{Configurazione Iniziale:} La testina $\Delta$ è posizionata all'inizio dell'input $y$:
+$$ [ \ \underset{\Delta}{\ast} \ \dots \ y \ \dots \ \ast \ ] $$
+
+Il comportamento della nuova macchina $M'$ su un input generico $y$ è il seguente:
+\begin{enumerate}
+    \item Scrive $w$ a destra di $y$ sul nastro, senza cancellare $y$. La testina poi torna indietro:
+    $$ [ \ \ast \ \dots \ y \ \dots \ \underset{\Delta}{\ast} \ \dots \ w \ \dots \ ] $$
+    
+    \item Esegue $M$ su $w$. La testina opera isolata nella zona di $w$:
+    $$ [ \ \ast \ \dots \ y \ \dots \ \ast \ \dots \ \underset{\Delta_M}{w} \ \dots \ ] $$
+    
+    \item Se $M$ termina su $w$, esegue $M_L$ su $y$. La testina torna all'inizio sull'input originale:
+    $$ [ \ \underset{\Delta_{M_L}}{\ast} \ \dots \ y \ \dots \ \ast \ ] $$
+\end{enumerate}
+
+\begin{itemize}
+    \item Se $R(M)w \in L_{HALT}$ ($M$ termina su $w$) $\implies L(M') = L(M_L) = L$. Poiché $L$ soddisfa $P$ per ipotesi, allora $R(M') \in L_P$.
+    \item Se $R(M)w \notin L_{HALT}$ ($M$ non termina su $w$) $\implies M'$ va in loop e non accetta nulla. Quindi $L(M') = \emptyset$. Poiché $\emptyset$ NON soddisfa $P$, allora $R(M') \notin L_P$.
+\end{itemize}
+Quindi $L_{HALT} \le L_P$, da cui deduciamo che $L_P$ non è decidibile.
+
+\vspace{0.4cm}
+\textbf{Caso 2: Supponiamo che $\emptyset$ SODDISFI $P$.}
+Allora $\emptyset$ NON soddisfa $\neg P$.
+Per la dimostrazione precedente (Caso 1), $L_{\neg P}$ \textbf{NON è decidibile}.
+
+\begin{center}
+    \begin{tikzpicture}
+        % L'universo delle stringhe (grande ellisse per contenere tutto comodamente)
+        \draw[thick] (0,0) ellipse (4.5cm and 2.5cm);
+        \node at (-5.5, 1.8) {$\{0,1\}^*$};
+        
+        % Il cerchio L_P (a sinistra)
+        \draw[thick] (-1.5, 0.5) circle (1.2cm);
+        \node at (-1.5, 0.5) {$\mathcal{L}_P$};
+        
+        % Il cerchio L_not_P (a destra)
+        \draw[thick] (1.5, 0.5) circle (1.2cm);
+        \node at (1.5, 0.5) {$\mathcal{L}_{\neg P}$};
+        
+        % La spazzatura (nella parte bassa dell'ellisse)
+        \node[text width=6cm, align=center, font=\small] at (0, -1.2) {Stringhe che non sono \\ codifiche di MT};
+        
+       
+    \end{tikzpicture}
+    \end{center}
+
+\vspace{0.4cm}
+\text{Dimostrazione per assurdo (P.A.):}
+
+Se per assurdo $L_P$ fosse decidibile, allora il suo complementare sarebbe decidibile.
+Il complementare di $L_P$ è l'unione di $L_{\neg P}$ e della spazzatura. Quindi:
+
+$$ L_P \text{ decidibile} \implies L_{\neg P} \cup \{ \text{stringhe che non sono codifiche di MT} \} \text{ DECIDIBILE} $$
+
+Ma noi abbiamo un algoritmo che fa un banale controllo sintattico per vedere se una stringa è una codifica valida di una MT. Potremmo quindi filtrare le stringhe e decidere facilmente solo $L_{\neg P}$.
+
+$$ \implies L_{\neg P} \text{ DECIDIBILE} $$
+
+\textbf{ASSURDO!} (Perché abbiamo già dimostrato che $L_{\neg P}$ non è decidibile). 
+Di conseguenza, l'ipotesi iniziale cade: $L_P$ \textbf{NON è decidibile}. $\blacksquare$
+
+
+\vspace{0.8cm}
+\textbf{Esempi di Applicazione (e non) del Teorema di Rice}
+
+\begin{itemize}
+    \item \textbf{Esempio 1 (Applicazione standard):} 
+    Data una MT $M$, determinare se il linguaggio accettato da $M$ contiene più di 100 stringhe.
+    $$ L_0 = \{ R(M) \mid L(M) \text{ ha più di 100 stringhe} \} $$
+    \textit{Soluzione:} La proprietà riguarda $L(M)$ ed è NON BANALE (alcuni linguaggi sono infiniti, altri vuoti o con poche stringhe). Posso usare il Teorema di Rice. 
+    $\implies$ \textbf{$L_0$ NON È DECIDIBILE.}
+
+    \vspace{0.2cm}
+    \item \textbf{Esempio 2 (TRAPPOLA STRUTTURALE):} 
+    Data $M$, determinare se l'insieme degli stati di $M$ ha cardinalità maggiore di 50 (supponendo che non ci siano stati inutili).
+    \textit{Soluzione:} \textbf{NON SI PUÒ USARE IL TEOREMA DI RICE!} È una proprietà strutturale della macchina, non del suo linguaggio. 
+    Il problema è \textbf{DECIDIBILE}, perché posso letteralmente contare gli stati scorrendo la codifica della MT (controllando il quarto campo delle transizioni e incrementando un contatore se lo stato è nuovo).
+
+    \vspace{0.2cm}
+    \item \textbf{Esempio 3 (Proprietà di chiusura):} 
+    Data $M$, determinare se $L(M)$ è chiuso rispetto al ribaltamento della stringa. Ovvero, se $w = w_1 \dots w_n \in L(M)$, allora la sua forma speculare $w^R = w_n \dots w_1 \in L(M)$.
+    $$ L_0 = \{ R(M) \mid L(M) \text{ ha la proprietà indicata} \} $$
+    \textit{Soluzione:} Riguarda il linguaggio ed è una proprietà non banale (alcuni linguaggi sono palindromi, altri no). Posso applicare Rice.
+    $\implies$ \textbf{$L_0$ NON È DECIDIBILE.}
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Definizione (Macchina Riproducibile):} 
+Una MT $M$ si dice \textbf{RIPRODUCIBILE} quando $\exists M' \neq M$ tale che $L(M) = L(M')$.
+
+\begin{itemize}
+    \item \textbf{Problema 1 (TRAPPOLA DELLA BANALITÀ):} 
+    Dato un linguaggio semidecidibile $L$, determinare se esiste una MT riproducibile $M$ che accetta $L$.
+    $$ \{ R(M) \mid L(M) \text{ ha la proprietà indicata} \} $$
+    \textit{Soluzione:} \textbf{Osservazione Fondamentale:} OGNI singola MT è riproducibile! (Basta prendere $M$ e aggiungerle uno stato vuoto o inutile alla fine per creare una macchina $M'$ diversa ma con lo stesso linguaggio).
+    Poiché tutti i linguaggi possiedono questa proprietà, la proprietà è \textbf{BANALE}. Non posso usare Rice. 
+    Il problema è \textbf{DECIDIBILE} (l'algoritmo che lo decide è un programma banale che restituisce sempre "SÌ").
+\end{itemize}
+
+
+
+
+
