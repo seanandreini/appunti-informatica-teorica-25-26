@@ -2270,7 +2270,85 @@ Una MT $M$ si dice \textbf{RIPRODUCIBILE} quando $\exists M' \neq M$ tale che $L
     \textit{Soluzione:} \textbf{Osservazione Fondamentale:} OGNI singola MT è riproducibile! (Basta prendere $M$ e aggiungerle uno stato vuoto o inutile alla fine per creare una macchina $M'$ diversa ma con lo stesso linguaggio).
     Poiché tutti i linguaggi possiedono questa proprietà, la proprietà è \textbf{BANALE}. Non posso usare Rice. 
     Il problema è \textbf{DECIDIBILE} (l'algoritmo che lo decide è un programma banale che restituisce sempre "SÌ").
+    \vspace{0.4cm}
+    \item \textbf{Problema 2 (TRAPPOLA MISTA):} 
+    Dato un linguaggio semidecidibile $L$, determinare se esiste una MDT riproducibile con \textbf{meno di 10 stati} che accetta $L$.
+    $$ \mathcal{L} = \{ R(M) \mid L(M) \text{ è accettato da una MDT riproducibile con meno di 10 stati} \} $$
+    \textit{Soluzione:} 
+    \begin{itemize}
+        \item \textbf{Osservazione:} Abbiamo già visto che \textit{ogni} MDT è riproducibile. Quindi la parola "riproducibile" qui è solo un distrattore inserito per confondere. 
+        \item La vera proprietà del linguaggio in esame è: \textit{"Essere accettabile da una macchina con meno di 10 stati"}.
+        \item Ci sono linguaggi molto semplici che \textit{sono} accettati da MDT con meno di 10 stati (es. il linguaggio vuoto).
+        \item Ci sono linguaggi complessi che sono accettati \textit{solo} da MDT con più di 10 stati.
+    \end{itemize}
+    Poiché la proprietà divide i linguaggi in due categorie non vuote, \textbf{la proprietà è NON BANALE}. \\
+    $\implies$ Per il Teorema di Rice, $\mathcal{L}$ \textbf{NON È DECIDIBILE}.
 \end{itemize}
+
+\vspace{0.6cm}
+
+\subsubsection{Equivalenza tra Modelli di Calcolo}
+
+\textbf{Proposizione:} Ogni funzione $\mu$-ricorsiva è $\tau$-ricorsiva.
+
+\vspace{0.2cm}
+\textit{Dimostrazione (Idea):} Si procede per induzione strutturale sulla costruzione di una funzione $\mu$-ricorsiva.
+
+\begin{enumerate}
+    \item \textbf{Casi Base:} Si dimostra che le funzioni iniziali (Zero, Successore, Proiezione) sono $\tau$-ricorsive (esistono MDT banali che le calcolano).
+    
+    \vspace{0.2cm}
+    \item \textbf{Passo Induttivo (Composizione):} \\
+    Consideriamo ad esempio la composizione $f \circ (g_1, g_2) : \mathbb{N}^3 \to \mathbb{N}$, dove:
+    \begin{itemize}
+        \item $g_1, g_2 : \mathbb{N}^3 \to \mathbb{N}$
+        \item $f : \mathbb{N}^2 \to \mathbb{N}$
+    \end{itemize}
+    Per ipotesi induttiva, supponiamo di avere già a disposizione:
+    \begin{itemize}
+        \item $G_1$: MDT che calcola $g_1$
+        \item $G_2$: MDT che calcola $g_2$
+        \item $F$: MDT che calcola $f$
+    \end{itemize}
+    
+    L'obiettivo è costruire una grande macchina che le assembli. Il primo problema da risolvere è che sia $G_1$ che $G_2$ dovranno consumare gli stessi input ($x_1, x_2, x_3$). Pertanto, la fase preparatoria della nostra nuova macchina consisterà nel copiare l'input originale sul nastro:
+
+    \vspace{0.4cm}
+    \begin{center}
+    \begin{tikzpicture}[scale=0.9, transform shape]
+        % Disegno del nastro
+        \draw[thick] (0,0) rectangle (13.5, 0.6);
+        
+        % Contenuto del nastro
+        \node at (0.3, 0.3) {$\ast$};
+        \node at (1.2, 0.3) {$\dots x_1 \dots$};
+        \node at (2.2, 0.3) {$\ast$};
+        \node at (3.2, 0.3) {$\dots x_2 \dots$};
+        \node at (4.2, 0.3) {$\ast$};
+        \node at (5.2, 0.3) {$\dots x_3 \dots$};
+        \node at (6.2, 0.3) {$\ast$};
+        
+        \node[blue] at (7.2, 0.3) {$\dots x_1 \dots$};
+        \node[blue] at (8.2, 0.3) {$\ast$};
+        \node[blue] at (9.2, 0.3) {$\dots x_2 \dots$};
+        \node[blue] at (10.2, 0.3) {$\ast$};
+        \node[blue] at (11.2, 0.3) {$\dots x_3 \dots$};
+        \node[blue] at (12.2, 0.3) {$\ast$};
+        \node at (13.1, 0.3) {$\dots$};
+        
+        % Testine
+        \node[below] at (0.3, 0) {$\Delta$};
+        \node[below] at (6.8, 0) {$\Delta_{G_1}$};
+        
+        % Annotazione sopra il nastro
+        \draw[thick, blue] (6.5, 0.8) -- (6.5, 1) -- (12.5, 1) -- (12.5, 0.8);
+        \node[above, blue] at (9.5, 1) {\footnotesize 2 copie della prima parte...};
+    \end{tikzpicture}
+    \end{center}
+    \vspace{0.2cm}
+    \textit{Posizionando la testina all'inizio della copia ($\Delta_{G_1}$), possiamo lanciare l'esecuzione della prima sottomacchina preservando i dati originali per la seconda.}
+\end{enumerate}
+
 
 
 
