@@ -1,0 +1,180 @@
+\newpage
+
+%30/03/2026
+\section{Teoria della Complessità}
+
+\textbf{Definizione (Funzione di Complessità):} Data una Macchina di Turing standard $M$, definiamo la sua funzione di complessità temporale $tc_M : \mathbb{N} \to \mathbb{N}$ come:
+$$ tc_M(n) = \text{numero di transizioni eseguite da } M \text{ su una stringa di lunghezza } n \text{ nel \textbf{caso peggiore}} $$
+
+\subsection{Notazioni Asintotiche}
+Per confrontare l'efficienza degli algoritmi, ignoriamo le costanti e i termini di grado inferiore, concentrandoci sull'ordine di grandezza al crescere di $n$. Siano $f, g : \mathbb{N} \to \mathbb{N}$:
+
+\begin{itemize}
+    \item \textbf{Limite Superiore ($\mathcal{O}$ Grande):} $f \in \mathcal{O}(g)$ quando $\exists c > 0, \exists n_0 \in \mathbb{N}$ tale che $\forall n \ge n_0$, 
+    $$ \frac{f(n)}{g(n)} \le c $$
+    
+    \item \textbf{Limite Inferiore ($\Omega$):} $f \in \Omega(g)$ quando $\exists d > 0, \exists n_0 \in \mathbb{N}$ tale che $\forall n \ge n_0$, 
+    $$ \frac{f(n)}{g(n)} \ge d $$
+    
+    \item \textbf{Limite Esatto ($\Theta$):} $f \in \Theta(g)$ quando $f \in \mathcal{O}(g)$ e $f \in \Omega(g)$. Cioè $\exists c, d > 0$ tali che $\forall n \ge n_0$:
+    $$ c \le \frac{f(n)}{g(n)} \le d $$
+    
+    \item \textbf{o piccolo:} $f \in o(g)$ quando $\lim_{n \to +\infty} \frac{f(n)}{g(n)} = 0$. (Nota: quando $f \in o(g) \implies f \in \mathcal{O}(g)$).
+    
+    \item \textbf{Equivalenza Asintotica ($\sim$):} $f \sim g$ quando $\lim_{n \to +\infty} \frac{f(n)}{g(n)} = 1$. (Nota: quando $f \sim g \implies f \in \Theta(g)$).
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Esempio:} $L \subseteq \{a,b\}^*$ \\
+$L$ è il linguaggio delle palindrome su $\{a,b\}$. Esempio stringa sul nastro: $\ast a b b a b b a$
+
+\vspace{0.4cm}
+\begin{center}
+\begin{tikzpicture}[>=Stealth, shorten >=1pt, on grid, auto, scale=0.9, transform shape]
+    % Posizioni esatte basate sulla griglia
+    \node[state, initial, initial text=] (q0) at (0,0) {$q_0$};
+    \node[state] (q1) at (2,0) {$q_1$};
+    \node[state, accepting] (qf) at (5,0) {$q_f$};
+
+    % Ramo Superiore ('a')
+    \node[state] (q_alpha) at (2,2) {$q_\alpha$};
+    \node[state] (q2) at (4,2) {$q_2$};
+    \node[state] (q3) at (6,2) {$q_3$};
+    \node[state] (q4) at (8,2) {$q_4$};
+
+    % Ramo Inferiore ('b')
+    \node[state] (q_beta) at (2,-2) {$q_\beta$};
+    \node[state] (q6) at (4,-2) {$q_6$};
+    \node[state] (q7) at (6,-2) {$q_7$};
+    \node[state] (q8) at (8,-2) {$q_8$};
+
+    % Stato di ritorno
+    \node[state] (qs) at (10, 0.5) {$q_s$}; 
+
+    \path[->]
+        % Partenza e smistamento
+        (q0) edge node {$*/D$} (q1)
+        (q1) edge node {$a/*$} (q_alpha)
+        (q1) edge node [swap] {$b/*$} (q_beta)
+        (q1) edge node {$*/*$} (qf)
+
+        % RAMO SUPERIORE (Gestione 'a')
+        (q_alpha) edge node {$*/D$} (q2)
+        (q2) edge node {$a,b/D$} (q3)
+        (q2) edge node {$*/*$} (qf) % Accetta palindrome pari
+        (q3) edge [loop above] node {$a,b/D$} (q3)
+        (q3) edge node {$*/S$} (q4)
+        (q4) edge [loop above] node {$a/*$} (q4) % Sovrascrive 'a' con '*'
+        (q4) edge node {$*/S$} (qs)
+
+        % RAMO INFERIORE (Gestione 'b')
+        (q_beta) edge node {$*/D$} (q6)
+        (q6) edge node {$a,b/D$} (q7)
+        (q6) edge node [swap] {$*/*$} (qf) % Accetta palindrome pari
+        (q7) edge [loop above] node {$a,b/D$} (q7)
+        (q7) edge node {$*/S$} (q8)
+        (q8) edge [loop right] node {$b/*$} (q8) % Sovrascrive 'b' con '*'
+        (q8) edge node [swap] {$*/S$} (q4) % LA SCORCIATOIA VERTICALE
+
+        % RITORNO
+        (qs) edge [loop right] node {$a,b/S$} (qs)
+        (qs) edge [out=-110, in=-80, distance=3.5cm] node [above] {$*/D$} (q1); % Curva lunga inferiore
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4cm}
+\subsubsection*{Come funziona (in breve):}
+La macchina verifica se la stringa è palindroma smangiandola dagli estremi verso il centro:
+\begin{enumerate}
+    \item \textbf{Lettura e Memorizzazione:} In $q_1$ legge il primo carattere, lo cancella (scrive `*`) e "memorizza" cosa ha letto prendendo la strada in alto (se era `a`) o in basso (se era `b`).
+    \item \textbf{Corsa a destra:} Scorre l'intera stringa ($q_3$ o $q_7$) finché non sbatte contro il `*` che delimita la fine.
+    \item \textbf{Verifica finale:} Fa un passo indietro. Se si trova sul ramo alto ($q_4$), si aspetta di trovare una `a`; se si trova sul ramo basso ($q_8$) si aspetta una `b`. Se il carattere corrisponde, lo cancella (sostituendolo con `*`).
+    \item \textbf{Ritorno:} Sfrutta lo stato $q_s$ per riavvolgere il nastro tutto a sinistra, fino a trovare il primo `*`. A quel punto fa un passo a destra e ricomincia il ciclo da $q_1$.
+    \item \textbf{Accettazione:} Se il nastro si svuota (cioè in $q_1$, $q_2$ o $q_6$ legge direttamente `*` invece di una lettera), la parola era palindroma e va in $q_f$.
+\end{enumerate}
+
+\vspace{0.4cm}
+\subsubsection*{Calcolo della Complessità nel Caso Peggiore (Accettazione)}
+Sia $m$ la lunghezza della stringa di input.
+
+\textbf{Caso pari ($m = 2k$):}
+\begin{align*}
+    &\begin{array}{l}
+        1 + 2 + (2k-1) + \\
+        1 + 2 + (2k-2) + \\
+        \vdots \\
+        1 + 2 + 1 + \\
+        1 + 2 + 0 + \\
+        2
+    \end{array}
+    \Bigg| = 2 + \sum_{i=0}^{2k-1} (3+i) = 2 + \sum_{i=0}^{2k-1} 3 + \sum_{i=0}^{2k-1} i = 2 + 3(2k) + \frac{2k(2k-1)}{2} \\
+    &\phantom{\begin{array}{l} \vdots \\ 2 \end{array}} = \mathbf{\frac{m(m-1)}{2} + 3m + 2} \implies \Theta(m^2)
+\end{align*}
+
+\textbf{Caso dispari ($m = 2k-1$):}
+\begin{align*}
+    &\begin{array}{l}
+        1 + 2 + (2k-2) + \\
+        1 + 2 + (2k-3) + \\
+        \vdots \\
+        1 + 2 + 2 + \\
+        1 + 2 + 1 + \\
+        4
+    \end{array}
+    \Bigg| = 4 + \sum_{i=1}^{2k-2} (3+i) = 4 + 3(2k-1) + \sum_{i=1}^{2k-2} i = 4 + 3(2k-1) + \frac{(2k-1)(2k-2)}{2} \\
+    &\phantom{\begin{array}{l} \vdots \\ 4 \end{array}} = \mathbf{4 + 3m + \frac{m(m-1)}{2}} \implies \Theta(m^2)
+\end{align*}
+
+
+\vspace{0.8cm}
+
+\subsubsection*{Costo Temporale delle Varianti di MDT}
+
+\textbf{Prop:} Se $M$ è una MDT a $k$ tracce che accetta $L$ con $tc_M(m) = f(m) \implies \exists M'$ MDT standard che accetta $L$ tale che $tc_{M'}(m) = f(m)$.
+
+\vspace{0.4cm}
+\textbf{Prop:} Se $M$ è una MDT a $k$ nastri ($k>1$) che accetta $L$ con $tc_M(n) = f(n) \implies \exists M'$ MDT standard che accetta $L$ tale che $tc_{M'}(n) = \mathcal{O}(f(n)^2)$.
+
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.9, transform shape]
+    % Nastro 1 (inferiore)
+    \node[left] at (-0.2, 0.2) {\textbf{1}};
+    \draw[thick] (0,0) rectangle (3,0.4);
+    \draw[thick] (0.8,0) -- (0.8,0.4);
+    \draw[thick] (1.2,0) -- (1.2,0.4);
+    \node[below] at (1,-0.05) {$\Delta$};
+
+    % Nastro 2 (superiore)
+    \node[left] at (-0.2, 1.2) {\textbf{2}};
+    \draw[thick] (0,1) rectangle (3,1.4);
+    \draw[thick] (2,1) -- (2,1.4);
+    \draw[thick] (2.4,1) -- (2.4,1.4);
+    \node[below] at (2.2,0.95) {$\Delta$};
+
+    % Freccia di simulazione (squiggles)
+    \node at (4.5, 0.7) {\LARGE $\leadsto$};
+
+    % Nastro singolo a 4 tracce (2k tracce)
+    \node[left] at (6.8, 0.2) {\textbf{1}};
+    \node[left] at (6.8, 0.6) {\textbf{2}};
+    \node[left] at (6.8, 1.0) {\textbf{3}};
+    \node[left] at (6.8, 1.4) {\textbf{4}};
+    
+    \draw[thick] (7,0) rectangle (11,1.6);
+    \draw (7,0.4) -- (11,0.4);
+    \draw (7,0.8) -- (11,0.8);
+    \draw (7,1.2) -- (11,1.2);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{Analisi dei costi per la $t$-esima transizione di $M$:} \\
+Al passo $t$, le testine virtuali si sono potute allontanare al massimo di $t$ celle dall'inizio. 
+Per simulare un singolo passo, la testina della nuova macchina deve fare una scansione andata e ritorno per leggere i dati e un'altra per aggiornarli:
+$$ \text{Costo } t\text{-esima transizione di } M \qquad 2t \cdot k + 2t \cdot k = 4tk $$
+
+\vspace{0.4cm}
+\text{Stima del limite superiore del numero di transizioni eseguite da $M'$ su input di lunghezza $n$ nel caso peggiore:}
+
+$$ \sum_{t=1}^{f(n)} 4tk = 4k \sum_{t=1}^{f(n)} t = 4k \cdot \frac{f(n) \cdot (f(n)+1)}{2} = \mathbf{\Theta(f(n)^2)} $$
