@@ -95,9 +95,9 @@ La macchina verifica se la stringa è palindroma smangiandola dagli estremi vers
 
 \vspace{0.4cm}
 \subsubsection*{Calcolo della Complessità nel Caso Peggiore (Accettazione)}
-Sia $m$ la lunghezza della stringa di input.
+Sia $n$ la lunghezza della stringa di input.
 
-\textbf{Caso pari ($m = 2k$):}
+\textbf{Caso pari ($n = 2k$):}
 \begin{align*}
     &\begin{array}{l}
         1 + 2 + (2k-1) + \\
@@ -108,10 +108,10 @@ Sia $m$ la lunghezza della stringa di input.
         2
     \end{array}
     \Bigg| = 2 + \sum_{i=0}^{2k-1} (3+i) = 2 + \sum_{i=0}^{2k-1} 3 + \sum_{i=0}^{2k-1} i = 2 + 3(2k) + \frac{2k(2k-1)}{2} \\
-    &\phantom{\begin{array}{l} \vdots \\ 2 \end{array}} = \mathbf{\frac{m(m-1)}{2} + 3m + 2} \implies \Theta(m^2)
+    &\phantom{\begin{array}{l} \vdots \\ 2 \end{array}} = \mathbf{\frac{n(n-1)}{2} + 3n + 2} \implies \Theta(n^2)
 \end{align*}
 
-\textbf{Caso dispari ($m = 2k-1$):}
+\textbf{Caso dispari ($n = 2k-1$):}
 \begin{align*}
     &\begin{array}{l}
         1 + 2 + (2k-2) + \\
@@ -122,15 +122,14 @@ Sia $m$ la lunghezza della stringa di input.
         4
     \end{array}
     \Bigg| = 4 + \sum_{i=1}^{2k-2} (3+i) = 4 + 3(2k-1) + \sum_{i=1}^{2k-2} i = 4 + 3(2k-1) + \frac{(2k-1)(2k-2)}{2} \\
-    &\phantom{\begin{array}{l} \vdots \\ 4 \end{array}} = \mathbf{4 + 3m + \frac{m(m-1)}{2}} \implies \Theta(m^2)
+    &\phantom{\begin{array}{l} \vdots \\ 4 \end{array}} = \mathbf{4 + 3n + \frac{n(n-1)}{2}} \implies \Theta(n^2)
 \end{align*}
-
 
 \vspace{0.8cm}
 
 \subsubsection*{Costo Temporale delle Varianti di MDT}
 
-\textbf{Prop:} Se $M$ è una MDT a $k$ tracce che accetta $L$ con $tc_M(m) = f(m) \implies \exists M'$ MDT standard che accetta $L$ tale che $tc_{M'}(m) = f(m)$.
+\textbf{Prop:} Se $M$ è una MDT a $k$ tracce che accetta $L$ con $tc_M(n) = f(n) \implies \exists M'$ MDT standard che accetta $L$ tale che $tc_{M'}(n) = f(n)$.
 
 \vspace{0.4cm}
 \textbf{Prop:} Se $M$ è una MDT a $k$ nastri ($k>1$) che accetta $L$ con $tc_M(n) = f(n) \implies \exists M'$ MDT standard che accetta $L$ tale che $tc_{M'}(n) = \mathcal{O}(f(n)^2)$.
@@ -167,7 +166,6 @@ Sia $m$ la lunghezza della stringa di input.
     \draw (7,1.2) -- (11,1.2);
 \end{tikzpicture}
 \end{center}
-
 \vspace{0.4cm}
 \textbf{Analisi dei costi per la $t$-esima transizione di $M$:} \\
 Al passo $t$, le testine virtuali si sono potute allontanare al massimo di $t$ celle dall'inizio. 
@@ -178,3 +176,305 @@ $$ \text{Costo } t\text{-esima transizione di } M \qquad 2t \cdot k + 2t \cdot k
 \text{Stima del limite superiore del numero di transizioni eseguite da $M'$ su input di lunghezza $n$ nel caso peggiore:}
 
 $$ \sum_{t=1}^{f(n)} 4tk = 4k \sum_{t=1}^{f(n)} t = 4k \cdot \frac{f(n) \cdot (f(n)+1)}{2} = \mathbf{\Theta(f(n)^2)} $$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%01/04/2026
+\subsection{Complessità in tempo su MDT Non Deterministiche}
+
+\textbf{Definizione:} Sia $M$ una MDT Non Deterministica. Definiamo la sua complessità in tempo come:
+$$ tc_M(n) = \text{numero di transizioni eseguite da } M \text{ su una stringa di lunghezza } n \text{ nel \textbf{caso peggiore}} $$
+
+\textit{Nota bene:} Poiché $M$ è non deterministica, per una singola stringa $w$ esistono \textit{molteplici} percorsi di computazione (un albero di scelte). Il "caso peggiore" si calcola \textbf{scegliendo la computazione che massimizza il numero di transizioni} (il ramo più lungo dell'albero).
+
+\begin{center}
+    \begin{tikzpicture}[
+        scale=1, 
+        transform shape,
+        % Stile per i pallini delle configurazioni
+        conf/.style={circle, fill=black, inner sep=1.5pt},
+        confblue/.style={circle, fill=blue, inner sep=1.5pt}
+    ]
+    
+        % Linee guida del tempo (molto leggere, per far capire i passi)
+        \draw[dashed, gray!30] (1.5, 2.5) -- (1.5, -3.5) node[below, text=gray] {\footnotesize Passo 1};
+        \draw[dashed, gray!30] (3.0, 2.5) -- (3.0, -3.5) node[below, text=gray] {\footnotesize Passo 2};
+        \draw[dashed, gray!30] (4.5, 2.5) -- (4.5, -3.5) node[below, text=gray] {\footnotesize Passo 3};
+        \draw[dashed, gray!30] (6.0, 2.5) -- (6.0, -3.5) node[below, text=gray] {\footnotesize Passo $f(n)$};
+    
+        % Punto di partenza
+        \node[draw, circle, fill=white, inner sep=2pt, thick] (w) at (0, 0) {$w$};
+        
+        % Nodi Livello 1
+        \node[conf] (l1t) at (1.5, 1.5) {};
+        \node[conf] (l1m) at (1.5, 0) {};
+        \node[conf] (l1b) at (1.5, -1.5) {};
+        
+        % Nodi Livello 2 (Top e Middle)
+        \node[conf] (l2t1) at (3, 2) {};
+        \node[conf] (l2t2) at (3, 1) {};
+        \node[conf] (l2m1) at (3, 0) {};
+        \node[conf] (l3m1) at (4.5, 0) {};
+        \node[conf] (l2b1) at (3, -0.8) {};
+        
+        % Nodi Ramo Peggiore (Blu)
+        \node[confblue] (l2b2) at (3, -2) {};
+        \node[confblue] (l3b2) at (4.5, -2.5) {};
+        \node[confblue] (l4b2) at (6, -3) {};
+        
+        % Disegno Archi (Computazioni normali)
+        \begin{scope}[thick, -latex, shorten >=2pt]
+            \draw (w) -- (l1t);
+            \draw (w) -- (l1m);
+            \draw (w) -- (l1b);
+            \draw (l1t) -- (l2t1);
+            \draw (l1t) -- (l2t2);
+            \draw (l1m) -- (l2m1);
+            \draw (l2m1) -- (l3m1);
+            \draw (l1b) -- (l2b1);
+        \end{scope}
+    
+        % Disegno Archi (Ramo peggiore blu)
+        \begin{scope}[blue, line width=1.2pt, -latex, shorten >=2pt]
+            \draw (l1b) -- (l2b2);
+            \draw (l2b2) -- (l3b2);
+            \draw (l3b2) -- (l4b2);
+        \end{scope}
+    
+        % Etichetta Ramo Peggiore
+        \node[fill=none, right, text=blue, font=\footnotesize\bfseries] at (6.2, -3) {Caso peggiore: ramo più lungo};
+        
+        % Graffa per il grado di non determinismo (spostata a 1.8 per non accavallarsi)
+        \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick, gray!80] 
+            (1.8, -1.6) -- (1.8, 1.6) 
+            node[midway, right, xshift=100pt, text=black, align=left] {\footnotesize $\delta$: Grado di non determinismo \\\footnotesize (visivamente:numero massimo di rami che possono uscire da un singolo pallino.)};
+    
+    \end{tikzpicture}
+    \end{center}
+
+\vspace{0.4cm}
+\textbf{Proposizione (Simulazione Deterministica):} 
+Sia $L$ un linguaggio accettato da una MDT non deterministica $M$, e sia $tc_M(n) = f(n)$. 
+$\implies \exists M'$ MDT \textbf{deterministica} che accetta $L$ tale che:
+$$ tc_{M'}(n) = \mathcal{O}\Big(f(n) \cdot \delta^{f(n)}\Big) $$
+\textit{(La complessità diventa \textbf{esponenziale} rispetto a $M$)}
+
+\vspace{0.2cm}
+\vspace{0.2cm}
+\textit{Dimostrazione (Idea della simulazione):} \\
+Costruiamo una MDT \textbf{deterministica} $M'$ a 3 nastri che sia equivalente a $M$. I tre nastri vengono impiegati nel seguente modo:
+\begin{itemize}
+    \item \textbf{Nastro 1:} Contiene l'input originale (sola lettura).
+    \item \textbf{Nastro 2:} Viene utilizzato per la simulazione effettiva delle operazioni di $M$.
+    \item \textbf{Nastro 3:} Contiene le computazioni di $M$, ovvero le sequenze delle scelte non deterministiche, rappresentate come vettori $(u_1, u_2, \dots, u_r)$ dove $1 \le u_i \le \delta$.
+\end{itemize}
+
+La strategia di $M'$ è sistematica: prima scrive tutte le possibili sequenze di computazione sul Nastro 3 (una dopo l'altra), e poi le esegue materialmente sul Nastro 2. 
+Per calcolare il costo temporale totale dell'algoritmo deterministico, la logica da seguire è: \textit{contare quanto serve per generare le computazioni e moltiplicarlo per quanto si impiega a eseguirle}.
+
+\begin{enumerate}
+    \item \textbf{Numero totale di sequenze generate:} Il numero di computazioni (sequenze) distinte di $M$, considerando una lunghezza massima $f(n)$ su un input di lunghezza $n$, è delimitato superiormente da $\mathbf{\delta^{f(n)}}$.
+    \item \textbf{Costo di una singola simulazione:} Il numero di transizioni eseguite da $M$ per simulare una singola computazione su una stringa di lunghezza $n$ è al massimo $\mathbf{f(n)}$.
+\end{enumerate}
+
+Il costo totale nel caso peggiore (il limite superiore) è dato dal prodotto di questi due fattori. Ne consegue che la complessità in tempo della macchina deterministica $M'$ è:
+$$ tc_{M'}(n) = \mathcal{O}\Big(f(n) \cdot \delta^{f(n)}\Big) $$
+
+\textit{Osservazione:} Questa dimostrazione evidenzia formalmente come l'eliminazione del non-determinismo comporti un'inevitabile esplosione \textbf{esponenziale} dei tempi di calcolo.
+\vspace{0.6cm}
+
+
+\subsubsection*{Esempio: Palindroma Binaria su MDT Non Deterministica}
+Vogliamo riconoscere il linguaggio delle palindrome binarie sfruttando il non-determinismo. 
+Con una MDT Non Deterministica a 2 nastri cambiamo strategia rispetto all'MDT deterministica, e "tiriamo a indovinare" le scelte corrette diramando la computazione ("guessing"). La macchina procede così:
+\begin{enumerate}
+    \item \textbf{Copia:} Scorre il Nastro 1 verso destra e copia i caratteri sul Nastro 2.
+    \item \textbf{Il Guessing (La Scelta):} Ad ogni passo, la macchina compie una scelta non deterministica. Può decidere di continuare a copiare, oppure "indovinare" di aver raggiunto l'esatto centro della stringa e cambiare stato.
+    \item \textbf{Verifica:} Se dichiara di essere al centro, smette di copiare. Inizia a confrontare il resto della parola sul Nastro 1 (procedendo verso destra) con la copia sul Nastro 2 (procedendo a ritroso verso sinistra).
+\end{enumerate}
+
+\vspace{0.4cm}
+\begin{center}
+    \begin{tikzpicture}[
+        scale=0.9, transform shape,
+        state/.style={circle, draw, thick, minimum size=0.9cm},
+        accepting/.style={double, double distance=2pt}
+    ]
+        % Nodi (Stati)
+        \node[state] (q0) at (0, 0) {$q_0$};
+        \node[state] (q1) at (3, 0) {$q_1$};
+        \node[state] (q2) at (7, 0) {$q_2$};
+        \node[state, accepting] (qf) at (11, 0) {$q_f$};
+    
+        % Transizioni
+        % q0 -> q1
+        \draw[-stealth, thick] (q0) -- node[above] {$** \mid DD$} (q1);
+    
+        % Loop q1 (Top)
+        \draw[-stealth, thick] (q1) to[out=110, in=70, looseness=5] node[above, align=center] {$b* \mid bb$ \\ $a* \mid aa$} (q1);
+    
+        % Loop q1 (Bottom) - Aggiunto!
+        \draw[-stealth, thick] (q1) to[out=250, in=290, looseness=5] node[below, align=center] {$aa \mid DD$ \\ $bb \mid DD$} (q1);
+    
+        % q1 -> q2 (Top Arrow)
+        \draw[-stealth, thick] (q1) to[bend left=25] node[above, align=center] (t1) {$b* \mid DS$ \\ $a* \mid aS$} (q2);
+        
+    
+        % q1 -> q2 (Bottom Arrow)
+        \draw[-stealth, thick] (q1) to[bend right=25] node[below, align=center] {$a* \mid DS$ \\ $b* \mid DS$} (q2);
+    
+        % Loop q2
+        \draw[-stealth, thick] (q2) to[out=110, in=70, looseness=5] node[above, align=center] {$aa \mid DS$ \\ $bb \mid DS$} (q2);
+    
+        % q2 -> qf (Aggiornato con **)
+        \draw[-stealth, thick] (q2) -- node[above] {$** \mid **$} (qf);
+    
+        % Legende aggiuntive per chiarezza (opzionali, ma utili per lo studio)
+        \node[below=1.8cm of q1, text=gray, align=center, font=\footnotesize] {Fase di Copia \\ (Nastro 1 $\to$ Nastro 2)};
+        \node[below=1.8cm of q2, text=gray, align=center, font=\footnotesize] {Fase di Verifica \\ (Nastro 1 vs Nastro 2)};
+        \node[text=blue, align=center, font=\footnotesize\bfseries] at (5, 2.5) {Bivio Non Deterministico \\ (Guessing del centro)};
+    
+    \end{tikzpicture}
+    \end{center}
+
+\vspace{0.4cm}
+\textbf{Complessità nel caso peggiore (Rifiuto):} 
+Il caso peggiore in questa simulazione si verifica quando la computazione ritarda il più possibile il fallimento. Questo accade se la macchina "indovina" erroneamente che il centro si trovi alla fine esatta della stringa: copierà tutti gli $n$ caratteri della stringa prima di accorgersi dell'errore (o di terminare l'input).
+Il numero di passi sarà $1$ (per la partenza) $+ n$ (per copiare tutta la stringa) $+ n$ (per tornare indietro se ipoteticamente verificasse).
+In ogni caso:
+$$ tc_M(n) = 1 + 2n = \mathcal{O}(n) $$
+
+\textit{Nota metodologica:} La complessità è crollata da $\mathcal{O}(n^2)$ a $\mathcal{O}(n)$. È tuttavia importante sottolineare che non ha senso confrontare direttamente le prestazioni dell'algoritmo deterministico a un nastro con questo non deterministico, perché abbiamo cambiato strategia computazionale.
+
+\vspace{0.5cm}
+
+\subsection{Le Classi P e NP}
+
+\begin{itemize}
+    \item \textbf{La Classe $\mathcal{P}$:} Linguaggi decidibili in tempo polinomiale da una macchina \textbf{deterministica}.
+    $$ \mathcal{P} = \{ L \mid \exists M \text{ MDT det. che accetta } L \text{ t.c. } tc_M(n) = \mathcal{O}(n^r), \exists r \in \mathbb{N} \} $$
+
+    \vspace{0.2cm}
+    \item \textbf{La Classe $\mathcal{NP}$:} Linguaggi decidibili in tempo polinomiale da una macchina \textbf{non deterministica}.
+    $$ \mathcal{NP} = \{ L \mid \exists M \text{ MDT non det. che accetta } L \text{ t.c. } tc_M(n) = \mathcal{O}(n^r), \exists r \in \mathbb{N} \} $$
+\end{itemize}
+
+\textbf{Osservazione:} $\mathcal{P} \subseteq \mathcal{NP}$ (una MDT deterministica è una MDT non deterministica con $\delta = 1$). Non sappiamo dire se $\mathcal{NP} \subseteq \mathcal{P}$. È un \textbf{PROBLEMA APERTO} (il più importante dell'informatica).
+
+\vspace{0.6cm}
+
+
+\subsubsection{Problema del circuito hamiltoniano (HAM)}
+
+\textbf{Definizione:} Dato un grafo orientato $G = (V, E)$ (dove $V$ sono i vertici ed $E$ gli archi), un \textbf{circuito hamiltoniano} in $G$ è una sequenza $(x_1, x_2, \dots, x_{n-1}, x_n, x_1)$ di vertici tale che:
+\begin{itemize}
+    \item $\forall i, \ (x_i, x_{i+1}) \in E$
+    \item $(x_n, x_1) \in E$
+    \item $V = \{x_1, \dots, x_n\}$
+\end{itemize}
+\textit{In parole povere: è un ciclo che passa una e una sola volta per tutti i vertici del grafo.}
+
+\vspace{0.3cm}
+\textbf{Problema:} Dato un grafo orientato $G$, determinare se $G$ possiede un circuito hamiltoniano.
+
+\vspace{0.4cm}
+\textbf{Codifica in una Macchina di Turing ($M$):} \\
+Consideriamo $G = (V,E)$ con $V = \{1, 2, \dots, n\}$.
+\begin{itemize}
+    \item \textbf{Codifica dei vertici:} Si usa la codifica binaria (indicheremo la codifica di $x_i$ con $\underline{x_i}$).
+    \item \textbf{Codifica degli archi:} Un arco $(x_i, x_j)$ viene codificato come $\underline{x_i} \# \underline{x_j}$.
+    \item \textbf{Codifica del grafo:} Il grafo sul nastro è codificato come la lista di tutti i suoi archi, seguita dal numero totale di vertici $n$.
+\end{itemize}
+
+Esempio di come appare il grafo codificato sul nastro:
+$$ \dots \underline{x_i} \# \underline{x_j} \#\# \underline{x_k} \# \underline{x_h} \#\# \dots \#\#\# \underline{n} $$
+\textit{(I simboli $\#$ fungono da separatori tra i vari elementi codificati).}
+
+\vspace{0.6cm}
+
+
+\textbf{Setup dei Nastri (MDT a 4 nastri):}
+\begin{itemize}
+    \item \textbf{Nastro 4:} \texttt{[ $\ast \ 1 \ \ast \ n \ \dots \ \ast \ n \ \ast \ 1$} \quad \textit{(Stringa terminatrice per il controllo)}
+    \item \textbf{Nastro 3:} \texttt{[ $\ast \ 1 \ \ast \ i_1$} \quad \textit{(Memoria per i vertici che hanno già passato i controlli)}
+    \item \textbf{Nastro 2:} \texttt{[ $\ast \ 1 \ \ast \ i_1 \ \ast \ i_2 \ \dots \ \ast \ i_{n-1} \ \ast \ 1$} \quad \textit{(Sequenza attualmente in esplorazione)}
+    \item \textbf{Nastro 1:} \texttt{[ GRAFO IN INPUT ]}
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Procedura dell'algoritmo deterministico:}
+\begin{enumerate}
+    \item Scrivo sul \textbf{Nastro 4} la sequenza di terminazione \texttt{$\ast 1 \ast n \dots \ast n \ast 1$} (di lunghezza $n+1$).
+    \item Sul \textbf{Nastro 2} genero, una dopo l'altra in ordine lessicografico, le stringhe di lunghezza $n+1$ composte da vertici di $V$ che iniziano e finiscono con $1$.
+    \item Confronto la stringa generata sul Nastro 2 col contenuto del Nastro 4:
+    \begin{itemize}
+        \item Se sono uguali $\implies$ \textbf{RIFIUTO} (ho esaurito tutte le combinazioni possibili).
+        \item Altrimenti, avvio il controllo sulla stringa generata sul Nastro 2.
+    \end{itemize} 
+    \item Scorrendo la sequenza, per ogni vertice $i_j$ verifico due condizioni:
+    \begin{itemize}
+        \item Controllo che $i_j$ non compaia tra gli elementi $i_k$ con $k<j$ (leggendo i vertici già validati e scritti sul Nastro 3).
+        \item Controllo che l'arco $(i_{j-1}, i_j) \in E$ (cercandolo nel Nastro 1).
+    \end{itemize}
+    \item Se \textbf{entrambi} i controlli sono passati, scrivo $i_j$ sul Nastro 3 e procedo col vertice successivo. \\
+    Altrimenti, abortisco la verifica di questa stringa e prendo la \textbf{prossima sequenza} sul Nastro 2.
+\end{enumerate}
+
+\vspace{0.4cm}
+
+\textbf{Complessità nel caso peggiore (Rifiuto della stringa):} \\
+Il caso pessimo per questo algoritmo si verifica quando il grafo in input \textbf{non possiede} alcun circuito hamiltoniano. In questa situazione, la macchina non troverà mai una sequenza valida e sarà costretta a generare e verificare \textit{tutte} le possibili combinazioni fino a raggiungere la stringa limite sul Nastro 4, prima di potersi fermare e rifiutare l'input.
+Il numero totale di sequenze da generare e testare sul Nastro 2 è circa $\mathbf{n^{n-1}}$. Di conseguenza, il tempo di calcolo nel caso peggiore esplode, confermando una complessità \textbf{fortemente esponenziale}.
+
+\vspace{0.2cm}
+\textit{Nota di implementazione (Padding):} Per garantire che l'algoritmo brute-force abbia sempre lo spazio su nastro necessario per testare sequenze sufficientemente lunghe, si applica una trasformazione al dato in ingresso. Si mappa il grafo originale $G$ in un nuovo grafo $G'$ aggiungendo un numero di vertici isolati pari a $n$.
+
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.9, transform shape]
+    % Grafo G originale
+    \draw[thick] plot [smooth cycle] coordinates {(0,0) (1,0.5) (2,0) (1.5,-1) (0,-0.5)};
+    \node at (1, -0.2) {\Large $G$};
+    \node[below] at (1, -1.2) {$n$ vertici};
+
+    % Freccia ondulata
+    \draw[->, thick, decorate, decoration={snake, amplitude=.4mm, segment length=3mm, post length=1mm}] (2.5, -0.2) -- (3.5, -0.2);
+
+    % Grafo G' nuovo
+    \draw[thick] plot [smooth cycle] coordinates {(4.5,0) (5.5,0.5) (6.5,0) (6,-1) (4.5,-0.5)};
+    \node at (5.5, -0.2) {\Large $G$};
+    \node[below] at (5.5, -1.2) {$n$ vertici};
+
+    % Vertici isolati
+    \filldraw (7.2, 0.4) circle (1pt);
+    \filldraw (7.6, 0.1) circle (1pt);
+    \filldraw (7.3, -0.3) circle (1pt);
+    \filldraw (7.8, -0.2) circle (1pt);
+    \filldraw (7.1, -0.7) circle (1pt);
+    \filldraw (7.5, -0.8) circle (1pt);
+    \node[below, align=center] at (7.4, -1.1) {$n$ vertici \\ isolati};
+
+    % Etichetta G'
+    \node[above left] at (4.5, 0.2) {\Large $G'$};
+    
+    % Testo in basso
+    \node[text=gray, font=\footnotesize] at (5.5, -2) {$G'$ è come $G$ ma ha $2n$ vertici, non solo $n$};
+\end{tikzpicture}
+\end{center}
+
+Lavorando sul grafo espanso $G'$ a $2n$ vertici, le sequenze da generare e testare nel caso peggiore salgono a $\mathbf{(2n)^{2n-1}}$.
+
+\vspace{0.6cm}
+\textbf{Osservazione Fondamentale su HAM e la classe $\mathcal{P}$:} \\
+Abbiamo appena dimostrato che questo specifico algoritmo deterministico per risolvere HAM impiega un tempo esponenziale $\mathcal{O}((2n)^{2n})$. Tuttavia, \textbf{da questo non possiamo assolutamente dedurre che $\text{HAM} \notin \mathcal{P}$}. \\
