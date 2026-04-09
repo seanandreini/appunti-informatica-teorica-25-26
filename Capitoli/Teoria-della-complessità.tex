@@ -478,3 +478,182 @@ Lavorando sul grafo espanso $G'$ a $2n$ vertici, le sequenze da generare e testa
 \vspace{0.6cm}
 \textbf{Osservazione Fondamentale su HAM e la classe $\mathcal{P}$:} \\
 Abbiamo appena dimostrato che questo specifico algoritmo deterministico per risolvere HAM impiega un tempo esponenziale $\mathcal{O}((2n)^{2n})$. Tuttavia, \textbf{da questo non possiamo assolutamente dedurre che $\text{HAM} \notin \mathcal{P}$}. \\
+
+
+
+
+
+
+
+
+
+
+
+%09/04/2026
+\newpage
+\subsubsection*{MDT Non Deterministica che risolve HAM}
+
+L'idea alla base di questo algoritmo è sfruttare il non-determinismo per non controllare tutte le combinazioni, ma generare un'unica computazione che "indovina" la soluzione corretta.
+
+Dato il grafo $G = (V,E)$, con $|V| = n$ e $|E| = k$.
+
+\vspace{0.3cm}
+\textbf{Setup dei Nastri:}
+\begin{itemize}
+    \item \textbf{Nastro 3:} \texttt{[ $\ast \ 1 \ \ast \ i_1 \ \ast \ \dots \ \ast \ i_j \ \ast$ } \quad \textit{(Controllo)}
+    \item \textbf{Nastro 2:} \texttt{[ $\ast \ 1 \ \ast \ i_1 \ \ast \ \dots \ \ast \ i_{j+1} \ast \ \dots \  \ast \ i_{n-1} \ \ast \ 1$ } \quad \textit{(Generazione della sequenza di vertici)}
+    \item \textbf{Nastro 1:} \texttt{[ $\dots$ CODIFICA DEL GRAFO $\dots$ } \quad \textit{(Input)}
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Analisi della lunghezza dell'input:} \\
+La codifica del grafo sul Nastro 1 appare strutturata nel seguente modo:
+$$ \dots \# \# \underbrace{\underline{i}}_{\log n} \# \underbrace{\underline{j}}_{\log n} \#\# \dots \underbrace{\#\#\#}_{\text{separatori}} \underbrace{\underline{n}}_{\log n} $$
+Considerando l'intero blocco degli archi, la lunghezza complessiva dell'input è limitata da:
+$$ \log n + k \log n \le (k+1) \log k \le k^2 $$
+
+\vspace{0.4cm}
+\textbf{Comportamento della MDT:}
+\begin{enumerate}
+    \item \textbf{Termino rifiutando} se $n > k$.
+    \item \textbf{Genero non deterministicamente} sul Nastro 2 una sequenza di vertici "candidato" circuito hamiltoniano.
+    \item \textbf{Controllo} (usando il Nastro 3) se la sequenza generata è davvero un circuito hamiltoniano.
+\end{enumerate}
+
+\vspace{0.4cm}
+\textbf{Caso peggiore: Accettazione}
+
+\textit{Osservazione:} In caso di accettazione, si ha sicuramente $k \ge n$. Pertanto, possiamo limitarci ad esprimere la complessità in tempo della MDT in funzione solamente di $k$.
+
+\vspace{0.3cm}
+\textbf{Calcolo della complessità in tempo:}
+\begin{itemize}
+    \item \textbf{Controllo iniziale:} $\mathcal{O}(k \log n)$
+    \item \textbf{Generazione della sequenza:} $\mathcal{O}(n \log n)$ \\
+    \textit{(generando $n+1$ vertici, impiegando $2 \log n$ transizioni per vertice)}
+    
+    \item $\forall$ \textbf{iterazione del ciclo di controllo:}
+    \begin{itemize}
+        \item Controllo che il nuovo vertice non sia già comparso (scorrendo la lista): $\mathcal{O}(n \log n)$
+        \item Verifico che ci sia un arco dal vertice precedente al nuovo vertice: $\mathcal{O}(k \log n)$
+        \item Riposiziono la testina del Nastro 3: $\mathcal{O}(n \log n)$
+    \end{itemize}
+    Ciascuna iterazione costa al massimo $\mathcal{O}(k \log n)$ transizioni. Poiché ci sono circa $n$ iterazioni, la complessità del ciclo di controllo ammonta a:
+    \item \textbf{Complessità del ciclo:} $\mathcal{O}(n k \log n)$
+\end{itemize}
+
+\vspace{0.2cm}
+Sommando tutte le fasi, la complessità totale risulta:
+\begin{align*}
+    &\mathcal{O}(k \log n) + \mathcal{O}(n \log n) + \mathcal{O}(n k \log n) \\
+    \le \;&\mathcal{O}(k \log k) + \mathcal{O}(k \log k) + \mathcal{O}(k^2 \log k) \\
+    \le \;&\mathcal{O}(k^2 \log k) \\
+    \le \;&\mathcal{O}(k^3) \quad \longleftarrow \text{Tempo Polinomiale!}
+\end{align*}
+Pertanto, $\mathbf{HAM \in NP}$.
+
+\vspace{0.2cm}
+\textit{Domanda fondamentale:} Costruire una soluzione è più costoso della verifica della soluzione? ($\mathbf{P \overset{?}{=} NP}$)
+
+
+\vspace{0.8cm}
+
+\subsubsection{Riducibilità Polinomiale}
+
+Siano $L_1, L_2$ linguaggi, con $L_1 \subseteq \Sigma_1^*$ e $L_2 \subseteq \Sigma_2^*$.
+
+\vspace{0.2cm}
+\textbf{Definizione:} $L_1$ è \textbf{polinomialmente riducibile} a $L_2$ quando:
+\begin{enumerate}
+    \item $L_1$ è riducibile a $L_2$, cioè $\exists f: \Sigma_1^* \to \Sigma_2^*$ tale che:
+    \begin{itemize}
+        \item $\forall w \in \Sigma_1^*, \quad w \in L_1 \iff f(w) \in L_2$
+        \item $f$ è computabile
+    \end{itemize}
+    \item $f$ è computabile in tempo polinomiale.
+\end{enumerate}
+
+\vspace{0.6cm}
+\textbf{Proposizione:} Siano $L_1 \subseteq \Sigma_1^*$ e $L_2 \subseteq \Sigma_2^*$. 
+Se $L_1$ è polinomialmente riducibile a $L_2$ e $L_2 \in P \implies \mathbf{L_1 \in P}$.
+
+\vspace{0.2cm}
+\textit{Dimostrazione:} \\
+Costruiamo una MDT $N$ che decide $L_1$. Su input $w \in \Sigma_1^*$:
+\begin{enumerate}
+    \item Calcolo $f(w)$ (usando la macchina $F$).
+    \item Decido se $f(w) \in L_2$ (usando la macchina $M$).
+\end{enumerate}
+
+Sappiamo che:
+$
+\begin{cases}
+    \text{$f$ è la riduzione polinomiale da $L_1$ a $L_2$ ($f: \Sigma_1^* \to \Sigma_2^*$)} \\
+    \text{$F$ è la MDT che calcola $f$ con } tc_F(n) \in \mathcal{O}(n^r) \\
+    \text{$M$ è la MDT deterministica che decide $L_2$, con } tc_M(n) \in \mathcal{O}(n^s)
+\end{cases}
+$
+
+con r e s interi positivi (essendo $f$ e $M$ polinomiali).
+
+\vspace{0.3cm}
+Calcoliamo la \textbf{complessità in tempo} della macchina $N$:
+\begin{align*}
+    tc_N(n) &= tc_F(n) + tc_M(n^r) \\
+    &\in \mathcal{O}(n^r) + \mathcal{O}((n^r)^s) \\
+    &= \mathcal{O}(n^r) + \mathcal{O}(n^{rs}) \\
+    &= \mathcal{O}(n^{rs})
+\end{align*}
+Essendo limitata da un polinomio, segue che la macchina $N$ opera in tempo polinomiale, quindi $L_1 \in P$.
+
+
+\vspace{0.8cm}
+
+\subsubsection{Classi NP-difficile e NP-completo}
+
+\textbf{Definizione:} Un linguaggio $L$ si dice \textbf{NP-difficile} quando:
+$$ \forall Q \in NP, \quad Q \text{ è polinomialmente riducibile a } L \quad  $$
+
+\vspace{0.4cm}
+\textbf{Definizione:} Un linguaggio $L$ si dice \textbf{NP-completo} quando soddisfa le seguenti condizioni:
+\begin{enumerate}
+    \item $L$ è NP-difficile
+    \item $L \in NP$
+\end{enumerate}
+
+Si definisce $\mathbf{NPC} = \{ L \mid L \text{ è NP-completo} \}$. \\
+Vale la relazione $\mathbf{NPC \subseteq NP}$ \textit{(è la classe dei problemi più "difficili" contenuta in NP).}
+
+
+\vspace{0.8cm}
+
+\subsubsection{Relazione tra P, NP e NPC}
+
+\textbf{Proposizione:} Supponiamo che $\exists L$ tale che $L \in NPC$ e $L \in P$, allora $\mathbf{P = NP}$. \\
+In forma logica: $\Big( (\exists L) (L \in NPC \text{ e } L \in P) \Big) \implies P = NP$.
+
+\vspace{0.3cm}
+\textit{Dimostrazione:} \\
+Sappiamo già che $P \subseteq NP$. Vogliamo dimostrare che $NP \subseteq P$. \\
+Sia $Q \in NP$. Poiché $L$ è NP-difficile per ipotesi, $\exists f$ riducibilità polinomiale da $Q$ a $L$. \\
+Poiché $L \in P$, $\exists M$ MDT deterministica polinomiale che accetta $L$.
+
+\vspace{0.2cm}
+Costruiamo la MDT che accetta $Q$: 
+\begin{center}
+    \fbox{\textbf{Deterministica Polinomiale}}
+\end{center}
+
+\vspace{0.1cm}
+Su input $w$:
+\begin{itemize}
+    \item[$\circ$] Calcolo $f(w)$ \hspace{2cm} \textit{(eseguito in tempo polinomiale)}
+    \item[$\circ$] Decido se $f(w) \in L$ \hspace{0.85cm} \textit{(uso $M$, eseguito in tempo polinomiale)}
+\end{itemize}
+
+\begin{center}
+    $\Downarrow$ \\[0.1cm]
+    $\mathbf{Q \in P}$
+\end{center}
+Avendo dimostrato che per un qualunque problema $Q \in NP$ si ha che $Q \in P$, deduciamo che $NP \subseteq P$. \\
+Concludiamo quindi che $\mathbf{P = NP}$.
