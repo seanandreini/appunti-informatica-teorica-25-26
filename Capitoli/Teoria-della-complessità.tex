@@ -657,3 +657,159 @@ Su input $w$:
 \end{center}
 Avendo dimostrato che per un qualunque problema $Q \in NP$ si ha che $Q \in P$, deduciamo che $NP \subseteq P$. \\
 Concludiamo quindi che $\mathbf{P = NP}$.
+
+
+
+
+
+
+
+
+
+
+
+
+%15/04/2026
+\subsection{Il Problema SAT (Satisfiability)}
+\subsubsection{Rappresentazione delle Istanze di un Problema}
+
+Siano date le istanze di un problema $\{p_1, p_2, \dots, p_i, \dots\}$ e due loro possibili rappresentazioni:
+\begin{align*}
+    rep_1&: \{p_1, p_2, \dots, p_i, \dots\} \longrightarrow \Sigma_1^* \\
+    rep_2&: \{p_1, p_2, \dots, p_i, \dots\} \longrightarrow \Sigma_2^*
+\end{align*}
+
+\textbf{Definizione:} $rep_1$ è \textbf{polinomialmente trasformabile} in $rep_2$ quando $\exists t: \Sigma_1^* \to \Sigma_2^*$ tale che:
+\begin{enumerate}
+    \item[i)] $\forall i, \quad t(rep_1(p_i)) = rep_2(p_i)$
+    \item[ii)] $\forall w \in \Sigma_1^*, \quad w \notin \text{Im}(rep_1) \implies t(w) \notin \text{Im}(rep_2)$
+    \item[iii)] $t$ è computabile in tempo polinomiale
+\end{enumerate}
+
+\vspace{0.4cm}
+\textbf{Osservazione:} Se $rep_1$ è polinomialmente trasformabile in $rep_2$, allora la lunghezza di $rep_2(p_i)$ (che è uguale a $t(rep_1(p_i))$) è al più polinomiale nella lunghezza di $rep_1(p_i)$. Pertanto, se un problema sta in $\mathcal{P}$ usando $rep_2$, allora il problema sta in $\mathcal{P}$ anche usando $rep_1$.
+
+\begin{center}
+    \fbox{\textbf{Attenzione al caso delle rappresentazioni binaria e unaria di un numero naturale!}}
+\end{center}
+La trasformazione da binario a unario \textbf{non è polinomiale} (è esponenziale)!
+Può accadere che un problema stia in $\mathcal{P}$ con la rappresentazione unaria, ma non stia in $\mathcal{P}$ con la rappresentazione binaria.
+
+
+\vspace{0.8cm}
+\subsubsection{Polinomi Booleani}
+
+\textbf{Definizione:} Dati $x_1, x_2, \dots, x_m$ indeterminate, definiamo il \textbf{Polinomio Booleano} in $x_1, x_2, \dots, x_m$. L'insieme $PB(x_1, \dots, x_m)$ dei polinomi booleani è definito induttivamente:
+\begin{itemize}
+    \item $0, 1 \in PB(x_1, \dots, x_m)$
+    \item $\forall i \le m, \quad x_i \in PB(x_1, \dots, x_m)$
+    \item $p, q \in PB(x_1, \dots, x_m) \implies (p \lor q), (p \land q), p' \in PB(x_1, \dots, x_m)$
+    \item Nient'altro è un polinomio booleano.
+\end{itemize}
+
+\textit{Esempi di appartenenza a $PB(x,y,z)$:} $0, \ y, \ x \lor y, \ (x' \land z)' \lor (x \lor y)'$
+
+\vspace{0.4cm}
+\textbf{Esempio di valutazione:} \\
+Dato il polinomio $(x' \land z)' \lor (x \lor y)'$, valutiamolo con l'assegnamento $x=0, y=1, z=0$:
+\begin{center}
+    $(0' \land 0)' \lor (0 \lor 1)' \implies (1 \land 0)' \lor (1)' \implies (0)' \lor 0 \implies 1 \lor 0 \implies \mathbf{1}$
+\end{center}
+
+\begin{minipage}{0.4\textwidth}
+    \vspace{0.2cm}
+    Tabella di verità per $x \land y$:
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \begin{tabular}{c|c||c}
+        $x$ & $y$ & $x \land y$ \\
+        \hline
+        0 & 0 & 0 \\
+        0 & 1 & 0 \\
+        1 & 0 & 0 \\
+        1 & 1 & 1 \\
+    \end{tabular}
+\end{minipage}
+
+\vspace{0.6cm}
+\textbf{Definizione:} Due polinomi booleani $p, q$ sono \textbf{equivalenti} ($p \equiv q$) quando, $\forall t$ assegnamento di valore booleano alle variabili, si ha $t(p) = t(q)$.
+
+\vspace{0.4cm}
+\textbf{Definizioni su $PB(x_1, \dots, x_m)$:}
+\begin{itemize}
+    \item \textbf{Letterale:} Variabile o negazione di variabile (es. $x_i$ o $x_i'$).
+    \item \textbf{Clausola:} Disgiunzione di letterali (es. $x_2 \lor x_4' \lor x_1' \lor x_8$).
+    \item \textbf{Polinomio Booleano in Forma Normale Congiuntiva (CNF):} Congiunzione di clausole. \\
+    \textit{Esempio:} $(x_1 \lor x_3') \land (x_2 \lor x_3 \lor x_5') \land x_1'$
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Definizione:} Un polinomio booleano $p$ si dice \textbf{soddisfacibile} quando $\exists t$ assegnamento tale che $t(p) = 1$. \\
+\textit{Osservazione:} Un assegnamento $t$ per le variabili $\{x_1, \dots, x_m\}$ è una funzione $t: \{x_1, \dots, x_m\} \to \{0, 1\}$.
+
+\vspace{0.6cm}
+\subsubsection{Definizione del Problema SAT}
+
+\textbf{Definizione (SAT):} Dato un polinomio booleano $p$ in CNF, determinare se $p$ è soddisfacibile.
+
+\vspace{0.4cm}
+\textbf{Codifica di un Polinomio Booleano in CNF:} \\
+Considerando le variabili $\{x_1, \dots, x_m\}$ e l'alfabeto $\Sigma_{SAT} = \{0, 1, \#, \lor, \land\}$:
+\begin{itemize}
+    \item \textbf{Variabili:} $x_i \leadsto \underline{i}$ \quad \textit{(dove $\underline{i}$ è la codifica binaria di $i$)}
+    \item \textbf{Letterali:} 
+    \begin{itemize}
+        \item Variabile affermata: $x_i \leadsto \underline{i} \# 1$
+        \item Variabile negata: $x_i' \leadsto \underline{i} \# 0$
+    \end{itemize}
+\end{itemize}
+
+\textit{Esempio di codifica:} 
+$$ (x_1 \lor x_2') \land (x_1' \lor x_3) \quad \leadsto \quad 1\#1 \lor 10\#0 \land 1\#0 \lor 11\#1 $$
+
+\vspace{0.5cm}
+\textbf{Codifica di un'istanza di SAT completa:} \\
+Lista delle variabili $\mathbf{\#\#}$ Codifica del Polinomio Booleano \\
+\textit{Esempio:} $1 \# 10 \# 11 \mathbf{\#\#} \dots$
+
+\newpage
+
+\textbf{Proposizione:} $\mathbf{SAT \in NP}$
+
+\textit{Dimostrazione:} Costruiamo una MDT Non Deterministica che risolve SAT. \\
+\textbf{Idea:} Genero non deterministicamente un assegnamento e controllo se soddisfa il polinomio.
+
+\vspace{0.2cm}
+\textbf{Setup dei Nastri (MDT a 2 nastri):}
+\begin{itemize}
+    \item \textbf{Nastro 2:} \texttt{[ $\dots \ \underline{i} \# 0 \#\# \dots \#\# \underline{j} \# 1 \#\# \dots$ } \quad \textit{(Generazione assegnamento per $\{x_1, \dots, x_m\}$)}
+    \item \textbf{Nastro 1:} \texttt{[ $\dots$ istanza var $\#\#$ cod pol. $\dots$ } \quad \textit{(Input)}
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Logica di verifica:} \\
+Per ogni letterale letto sull'input (Nastro 1), controllo il valore binario assegnato a quel letterale sul Nastro 2:
+\begin{enumerate}
+    \item \textbf{Se coincidono} (il letterale valuta a 1): La clausola corrente è soddisfatta! Passo ad analizzare la clausola successiva. Se la clausola era l'ultima, \textbf{accetto}.
+    \item \textbf{Se sono diversi} (il letterale valuta a 0): Passo ad analizzare il letterale successivo della stessa clausola. Se il letterale era l'ultimo della sua clausola (e nessuno l'ha soddisfatta), \textbf{rifiuto}.
+\end{enumerate}
+
+
+\vspace{0.6cm}
+\textbf{Calcolo della Complessità nel Caso Peggiore (Accettazione):} \\
+Siano:
+\begin{itemize}
+    \item $n$ = numero di variabili
+    \item $k$ = numero totale di letterali nel polinomio
+\end{itemize}
+
+La lunghezza totale dell'input è limitata da:
+$$ \underbrace{n \cdot \log n}_{\text{codifica lista variabili}} + \underbrace{k \cdot \log n}_{\text{codifica dei letterali}} = \mathbf{(n+k) \log n} $$
+
+\textbf{Stima del numero di transizioni:}
+\begin{align*}
+    tc_M &\approx \underbrace{n \log n}_{\text{generazione}} + \underbrace{k \cdot n \log n}_{\text{verifica}} \\
+    &\le n^2 + k n^2 \\
+    &\le \Big((n+k) \log n\Big)^2 + \Big((n+k) \log n\Big)^3
+\end{align*}
+Essendo il numero di transizioni limitato superiormente da un polinomio il cui termine dominante è cubico, concludiamo che l'algoritmo termina in tempo polinomiale. Pertanto, $\mathbf{SAT \in NP}$.
