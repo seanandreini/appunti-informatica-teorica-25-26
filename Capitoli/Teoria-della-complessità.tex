@@ -813,3 +813,165 @@ $$ \underbrace{n \cdot \log n}_{\text{codifica lista variabili}} + \underbrace{k
     &\le \Big((n+k) \log n\Big)^2 + \Big((n+k) \log n\Big)^3
 \end{align*}
 Essendo il numero di transizioni limitato superiormente da un polinomio il cui termine dominante è cubico, concludiamo che l'algoritmo termina in tempo polinomiale. Pertanto, $\mathbf{SAT \in NP}$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%16/04/2026
+\subsection{Teorema di Cook: SAT è NP-difficile}
+
+\textit{Dimostrazione:} \\
+Sia $L \in \mathcal{NP}$. \\
+Sia $M$ una Macchina di Turing non deterministica polinomiale che accetta $L$. \\
+Sia $tc_M(n) = p(n)$ (un polinomio in $n$ che rappresenta il numero massimo di transizioni di $M$ nel caso peggiore).
+
+Vogliamo costruire una riducibilità polinomiale da $L$ a SAT. Dobbiamo cioè trovare una funzione:
+$$ f: \Sigma_L^* \longrightarrow \Sigma_{\text{SAT}}^* $$
+Tale che $f$ sia computabile in tempo polinomiale, e che valga la seguente proprietà:
+$$ \forall w \in \Sigma_L^*, \quad w \in L \iff f(w) \text{ è un polinomio booleano soddisfacibile} $$
+Ricordando che $w \in L \iff M \text{ accetta } w$.
+
+\vspace{0.3cm}
+\textbf{Osservazione:} Non è restrittivo supporre che, $\forall w$ di lunghezza $n$, ogni computazione di $M$ su $w$ esegua \textbf{esattamente} $p(n)$ transizioni (basta "allungare" artificialmente le computazioni che terminerebbero prima).
+
+\vspace{0.4cm}
+\subsubsection*{Parametri della Macchina di Turing}
+Siano dati:
+\begin{itemize}
+    \item $Q = \text{insieme degli stati di } M = \{q_1, q_2, \dots, q_s\} \implies |Q| = s$
+    \item $\Sigma = \text{alfabeto di lavoro di } M = \{a_1, a_2, \dots, a_r\} \implies |\Sigma| = r$
+\end{itemize}
+
+\vspace{0.6cm}
+\subsubsection*{Definizione delle Variabili Booleane}
+Per descrivere ogni istante della computazione, utilizziamo 3 tipi di variabili booleane:
+
+\begin{enumerate}
+    \item $\mathbf{S(u, t)}$: \\
+    Se $S(u, t) = 1$ significa che all'istante $t$ la macchina $M$ si trova nello stato $q_u$. \\
+    Se $S(u, t) = 0 \implies$ la macchina non è in quello stato.
+    \begin{align*}
+        t &\in \{0, 1, \dots, p(n)\} \quad \text{(istante di tempo)} \\
+        u &\in \{1, 2, \dots, s\} \quad \text{(indice dello stato)}
+    \end{align*}
+
+    \item $\mathbf{C(i, j, t)}$: \\
+    Se $C(i, j, t) = 1$ significa che all'istante $t$ nella cella $i$-esima del nastro c'è il simbolo $a_j$.
+    \begin{align*}
+        t &\in \{0, 1, \dots, p(n)\} \\
+        i &\in \{1, 2, \dots, p(n)+1\} \quad \text{(indice della cella)} \\
+        j &\in \{1, 2, \dots, r\} \quad \text{(indice del simbolo)}
+    \end{align*}
+
+    \item $\mathbf{L(i, t)}$: \\
+    Se $L(i, t) = 1$ significa che all'istante $t$ la testina di $M$ si trova sulla cella $i$.
+    \begin{align*}
+        t &\in \{0, 1, \dots, p(n)\} \\
+        i &\in \{1, 2, \dots, p(n)+1\}
+    \end{align*}
+\end{enumerate}
+
+\vspace{0.6cm}
+\subsubsection*{Le 7 Condizioni di Validità della Computazione}
+Affinché i valori di queste variabili descrivano una computazione sensata e corretta di $M$, devono valere le seguenti regole:
+
+\begin{enumerate}
+    \item $\forall t, \ \exists! u : S(u, t) = 1$ \\
+    \textit{(Ad ogni istante c'è un unico stato in cui la macchina si trova).}
+    
+    \item $\forall t, \ \forall i, \ \exists! j : C(i, j, t) = 1$ \\
+    \textit{(Ad ogni istante, in ogni singola cella, c'è un solo simbolo).}
+    
+    \item $\forall t, \ \exists! i : L(i, t) = 1$ \\
+    \textit{(Ad ogni istante, la testina legge un'unica cella).}
+    
+    \item Al tempo $t=0$, imposto le variabili in modo che descrivano la configurazione iniziale di $M$:
+    \begin{center}
+        \begin{tikzpicture}[scale=0.9, transform shape]
+            % Linee orizzontali aperte a destra (nastro infinito)
+            \draw[thick] (0, 0.6) -- (8, 0.6);
+            \draw[thick] (0, 0) -- (8, 0);
+            
+            % Bordo sinistro (chiuso)
+            \draw[thick] (0, 0) -- (0, 0.6);
+            
+            % Separatore della prima cella
+            \draw[thick] (0.8, 0) -- (0.8, 0.6);
+            
+            % Separatore 
+            \draw[thick] (6, 0) -- (6, 0.6);
+            
+            % Contenuto della prima cella (marcatore di inizio nastro)
+            \node at (0.4, 0.25) {\Large $\ast$};
+            \node[above, font=\footnotesize] at (0.4, 0.6) {$1$}; 
+            
+            % Contenuto del resto del nastro
+            \node at (3.5, 0.3) {$- \ - \ - \ w \ - \ - \ - \ - \ - \ $};
+            
+            % Testina
+            \draw[-stealth, thick] (0.4, -0.6) -- (0.4, -0.05);
+            \node[below] at (0.4, -0.6) {$q_1$};
+        \end{tikzpicture}
+    \end{center}
+
+    \item Sia $F \subseteq Q$ l'insieme degli stati finali. \\
+    $\exists u : q_u \in F \text{ e } S(u, p(n)) = 1$ \\
+    \textit{(La macchina deve terminare in uno stato di accettazione).}
+    
+    \item $\forall t, \forall i, \quad L(i, t) = 0 \implies C(i, j, t) = C(i, j, t+1)$ \\
+    \textit{(Il contenuto di una cella non cambia all'istante successivo se la testina non vi si trovava sopra).}
+    
+    \item $\forall t, \forall i, \quad L(i, t) = 1 \implies$ \\
+    Le variabili $S(u, t+1), C(i, j, t+1), L(i, t+1)$ assumono valori compatibili con le transizioni della funzione $\delta$ di $M$.
+\end{enumerate}
+
+
+\vspace{0.8cm}
+
+\subsubsection*{Traduzione in Polinomi Booleani (Costruzione di $f(w)$)}
+
+Definiamo una macro-funzione booleana $U$ (Unicità) che garantisce che \textbf{una e una sola} variabile di un insieme sia vera:
+$$ U(y_1, y_2, \dots, y_k) = y_1 \lor y_2 \lor \dots \lor y_k = \left( \bigvee_{i=1}^k y_i \right) \land \bigwedge_{i \neq j} (y_i' \lor y_j') $$
+
+\textit{Esempio per $k=3$:}
+$$ U(y_1, y_2, y_3) = (y_1 \lor y_2 \lor y_3) \land (y_1' \lor y_2') \land (y_1' \lor y_3') \land (y_2' \lor y_3') $$
+\textit{Osservazione:} $U(y_1, \dots, y_k) = 1 \iff \exists! i : y_i = 1$
+
+\vspace{0.6cm}
+Traduciamo ora ciascuna delle 7 condizioni in una corrispondente sotto-formula booleana:
+
+\begin{enumerate}
+    \item[1)] Formula per l'unicità dello stato:
+    $$ \bigwedge_{t=0}^{p(n)} U\Big(S(1, t), S(2, t), \dots, S(s, t)\Big) = \mathbf{A} $$
+
+    \item[2)] Formula per l'unicità del simbolo in ogni cella:
+    $$ \bigwedge_{t=0}^{p(n)} \bigwedge_{i=1}^{p(n)+1} U\Big(C(i, 1, t), C(i, 2, t), \dots, C(i, r, t)\Big) = \mathbf{B} $$
+
+    \item[3)] Formula per l'unicità della posizione della testina:
+    $$ \bigwedge_{t=0}^{p(n)} U\Big(L(1, t), L(2, t), \dots, L(p(n)+1, t)\Big) = \mathbf{C} $$
+
+    \item[4)] Formula per l'inizializzazione ($t=0$):
+    $$ S(1, 0) \land L(1, 0) \land \bigwedge_{i=1}^n C(i, \text{``}w_i\text{''}, 0) \land \bigwedge_{i=n+1}^{p(n)+1} C(i, \text{``}\ast\text{''}, 0) = \mathbf{D} $$
+
+    \item[5)] Formula per l'accettazione finale:
+    $$ \bigvee_{q_u \in F} S(u, p(n)) = \mathbf{E} $$
+
+    \item[6)] Formula per l'inerzia del nastro (dove la testina non c'è, niente cambia):
+    $$ \bigwedge_{t=0}^{p(n)} \bigwedge_{i=1}^{p(n)+1} \left[ L(i, t) \lor \bigwedge_{j=1}^r \Big( C(i, j, t) \ \text{XNOR} \ C(i, j, t+1) \Big) \right] = \mathbf{F} $$
+    \textit{Nota esplicativa:} Si ricorda che l'operatore di uguaglianza logica (XNOR) si esprime in CNF come $z(x,y) = (x \lor y') \land (x' \lor y)$.
+
+    \item[7)] Formula per la validità delle transizioni $\delta$:
+    $$ \mathbf{G}_{u, t, i, j} = S(u, t)' \lor L(i, t)' \lor C(i, j, t)' \lor \bigvee_{( \ \ ) \in \delta(q_u, a_j)} \Big( S(\ \ , t+1) \land C(i, \ \ , t+1) \land L(\ \ , t+1) \Big) $$
+\end{enumerate}
