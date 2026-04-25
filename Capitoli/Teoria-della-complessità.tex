@@ -975,3 +975,248 @@ Traduciamo ora ciascuna delle 7 condizioni in una corrispondente sotto-formula b
     \item[7)] Formula per la validità delle transizioni $\delta$:
     $$ \mathbf{G}_{u, t, i, j} = S(u, t)' \lor L(i, t)' \lor C(i, j, t)' \lor \bigvee_{( \ \ ) \in \delta(q_u, a_j)} \Big( S(\ \ , t+1) \land C(i, \ \ , t+1) \land L(\ \ , t+1) \Big) $$
 \end{enumerate}
+
+\vspace{0.4cm}
+Il polinomio totale è composto dalla congiunzione di tutti questi polinomi. \\
+\textit{Osserviamo che tutti i polinomi sopra sono in CNF, tranne quello relativo alla proprietà 7, che però può essere trasformato in CNF in tempo polinomiale.} \hfill $\blacksquare$
+
+
+
+
+
+
+
+
+
+
+
+
+
+%23/04/2026
+\subsection{Proprietà della classe NP-Completo e NP-Difficile}
+
+\textbf{Proposizione:} Supponiamo che $\mathbf{P = NP}$. Sia $L \in \mathcal{NP}$, con $L \neq \emptyset$ e $\overline{L} \neq \emptyset$ (quindi $L$ è un linguaggio né vuoto né totale). Allora $L \in \mathbf{NPC}$ (cioè $L$ è NP-Completo).
+
+\vspace{0.2cm}
+\textit{Dimostrazione:} \\
+Sappiamo che $L \in \mathcal{NP}$. Facciamo vedere che $L$ è NP-difficile. \\
+Sia $Q \in \mathcal{NP}$, descriviamo una riduzione polinomiale da $Q$ a $L$. Poiché stiamo supponendo $\mathbf{P = NP}$, abbiamo che $Q \in \mathcal{P}$. 
+
+Poiché $L$ non è banale, sappiamo per ipotesi che:
+\begin{itemize}
+    \item $\exists \alpha \in L$
+    \item $\exists \beta \notin L$
+\end{itemize}
+
+Costruiamo la funzione di riduzione $f$:
+$$ f(w) = 
+\begin{cases} 
+\alpha & \text{se } w \in Q \\ 
+\beta & \text{se } w \notin Q 
+\end{cases} 
+$$
+Dato che $Q \in \mathcal{P}$, per calcolare $f$ e decidere se $w \in Q$ mi basta usare una Macchina di Turing deterministica polinomiale. Quindi $f$ è calcolabile in tempo polinomiale.
+
+\vspace{0.4cm}
+\textbf{Osservazione:}
+\begin{itemize}
+    \item $\emptyset$ \textbf{non} è NP-difficile. Se prendiamo un generico $Q \in \mathcal{NP}$, esiste una riduzione polinomiale da $Q$ a $\emptyset$? \textbf{NO!} Per evidenti ragioni insiemistiche, non avremmo alcun elemento in $\emptyset$ su cui mappare le stringhe accettate di $Q$.
+    \item $\Sigma^*$ \textbf{non} è NP-difficile. Il motivo è analogo al precedente (non avremmo elementi al di fuori di $\Sigma^*$ su cui mappare le stringhe rifiutate di $Q$).
+\end{itemize}
+
+\vspace{0.8cm}
+
+\textbf{Proposizione (Transitività della NP-difficoltà):} 
+Se $L$ è NP-difficile e $f$ è una riduzione polinomiale da $L$ a $Q$ ($L \le_p Q$), allora $Q$ è NP-difficile.
+
+\vspace{0.2cm}
+\textit{Dimostrazione:} \\
+Dato un generico $R \in \mathcal{NP}$, descriviamo una riduzione polinomiale da $R$ a $Q$.
+\begin{enumerate}
+    \item Poiché $L$ è NP-difficile e $R \in \mathcal{NP}$, $\exists g$ riduzione polinomiale da $R$ a $L$. \\
+    Ovvero $g: \Sigma_R^* \to \Sigma_L^*$ tale che $w \in R \iff g(w) \in L$.
+    \item Sappiamo per ipotesi che $L$ è polinomialmente riducibile a $Q$. \\
+    Ovvero $\exists f: \Sigma_L^* \to \Sigma_Q^*$ tale che $w \in L \iff f(w) \in Q$.
+\end{enumerate}
+
+Osserviamo che la composizione $f \circ g : \Sigma_R^* \to \Sigma_Q^*$ garantisce che:
+$$ w \in R \iff f(g(w)) \in Q $$
+Inoltre, essendo composizione di funzioni calcolabili in tempo polinomiale, $f \circ g$ è anch'essa calcolabile in tempo polinomiale. Questo dimostra che $R \le_p Q$, quindi $Q$ è NP-difficile.
+
+
+\vspace{0.8cm}
+
+\subsection{Il Problema 3-SAT}
+
+\textbf{Definizione (3-SAT):} Dato $p$ polinomio booleano in 3-CNF, determinare se $p$ è soddisfacibile.
+\begin{center}
+    \fbox{\textit{In 3-CNF, ogni clausola contiene esattamente 3 letterali.}}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{Osservazione:} $\text{3-SAT} \in \mathcal{NP}$. \\
+Facciamo vedere che 3-SAT è NP-difficile. Cerchiamo una riduzione polinomiale da SAT a 3-SAT.
+
+Sia $p$ un polinomio booleano in CNF: 
+$p = u_1 \land u_2 \land \dots \land u_m$ (dove $u_i$ sono le clausole). \\
+Analizziamo una singola clausola $u$ di $p$ e vediamo come trasformarla in una clausola $\tilde{u}$ equivalente per 3-SAT:
+
+\begin{enumerate}
+    \item \textbf{Se $u = v$ (un solo letterale):} \\
+    $\tilde{u} = (v \lor x \lor y) \land (v \lor x' \lor y) \land (v \lor x \lor y') \land (v \lor x' \lor y')$ \\
+    (dove $x, y$ sono variabili nuove). Si ha che $u$ è soddisfacibile $\iff \tilde{u}$ è soddisfacibile.
+    
+    \item \textbf{Se $u = v_1 \lor v_2$ (due letterali):} \\
+    $\tilde{u} = (v_1 \lor v_2 \lor x) \land (v_1 \lor v_2 \lor x')$ \\
+    (dove $x$ è una variabile nuova).
+    
+    \item \textbf{Se $u = v_1 \lor v_2 \lor v_3$ (tre letterali):} \\
+    $\tilde{u} = u$ (la clausola è già nel formato corretto).
+    
+    \item \textbf{Se $u = v_1 \lor v_2 \lor \dots \lor v_n$ con $n \ge 4$:} \\
+    Introduciamo $n-3$ nuove variabili $y_1, \dots, y_{n-3}$ e trasformiamo:
+    $$ \tilde{u} = (v_1 \lor v_2 \lor y_1) \land (v_3 \lor y_1' \lor y_2) \land \dots \land (v_j \lor y_{j-2}' \lor y_{j-1}) \land \dots \land (v_{n-1} \lor v_n \lor y_{n-3}') $$
+\end{enumerate}
+
+\vspace{0.4cm}
+\textit{Dimostrazione di validità per il caso 4 ($u$ soddisfacibile $\iff \tilde{u}$ soddisfacibile):}
+
+$\implies$ \textbf{Se $u$ è soddisfacibile allora $\tilde{u}$ è soddisfacibile.} \\
+Sia $V$ l'insieme delle variabili in $p$. Sia $t: V \to \{0,1\}$ un assegnamento tale che $t(u) = 1$. \\
+Sia $v_j$ il \textbf{primo} letterale di $u$ tale per cui $t(v_j) = 1$. \\
+Definiamo un nuovo assegnamento esteso $\tilde{t}: V \cup \{y_1, \dots, y_{n-3}\} \to \{0,1\}$ come segue:
+$$ \tilde{t}(x) = 
+\begin{cases} 
+t(x) & \text{se } x \in V \\
+1 & \text{se } x \in \{y_1, \dots, y_{j-2}\} \\
+0 & \text{se } x \in \{y_{j-1}, \dots, y_{n-3}\} 
+\end{cases} 
+$$
+Tale assegnamento rende vere tutte le nuove clausole.
+
+$\impliedby$ \textbf{Se $\tilde{u}$ è soddisfacibile allora $u$ è soddisfacibile.} \\
+Sia $\tilde{t}: V \cup \{y_1, \dots, y_{n-3}\} \to \{0,1\}$ un assegnamento tale che $\tilde{t}(\tilde{u}) = 1$. \\
+Sia $t = \tilde{t}|_V$ (la restrizione di $\tilde{t}$ alle sole variabili originali di $p$). Si dimostra che $t(u) = 1$.
+
+
+\vspace{0.8cm}
+
+\subsection{Problema del Vertex Cover (VC)}
+
+Sia $G = (V,E)$ un grafo non orientato.
+\vspace{0.2cm}
+
+\textbf{Definizione:} Un \textbf{Vertex Cover} in $G$ è un sottoinsieme di vertici $C \subseteq V$ tale che, $\forall \{x,y\} \in E$, si ha $x \in C$ oppure $y \in C$ (ogni arco è "coperto" da almeno uno dei suoi vertici estremi).
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2, transform shape]
+    % Nodi
+    \node[circle, draw, fill=black, inner sep=1.5pt] (A) at (0, 1) {};
+    \node[circle, draw, fill=black, inner sep=1.5pt] (B) at (2, 0.5) {};
+    \node[circle, draw, fill=black, inner sep=1.5pt] (C) at (0, -0.5) {};
+    \node[circle, draw, fill=black, inner sep=1.5pt] (D) at (2, -1) {};
+    \node[circle, draw, fill=black, inner sep=1.5pt] (E) at (3.5, 0) {};
+
+    % Evidenziazione Vertex Cover
+    \draw[thick] (A) circle (6pt);
+    \draw[thick] (B) circle (6pt);
+
+    % Archi
+    \draw[thick, gray] (A) -- (B);
+    \draw[thick, gray] (A) -- (C);
+    \draw[thick, gray] (B) -- (C);
+    \draw[thick, gray] (B) -- (D);
+    \draw[thick, gray] (B) -- (E);
+    
+    \node[right=1cm of E, text=gray, align=left, font=\footnotesize] {I due vertici cerchiati \\ formano un Vertex Cover \\ perché toccano tutti gli archi.};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{Definizione del Problema (VC):} Dato un grafo non orientato $G=(V,E)$ e un intero positivo $K$, determinare se $G$ possiede un Vertex Cover di cardinalità $K$.
+
+\vspace{0.4cm}
+\textbf{Osservazione:} $\text{VC} \in \mathcal{NP}$. \\
+Costruiamo una riduzione polinomiale da 3-SAT a VC per dimostrare che VC è NP-difficile.
+
+Sia $p$ un polinomio booleano in 3-CNF composto da $m$ clausole e $n$ variabili $\{x_1, \dots, x_n\}$:
+$$ p = (u_{1,1} \lor u_{1,2} \lor u_{1,3}) \land (u_{2,1} \lor u_{2,2} \lor u_{2,3}) \land \dots \land (u_{m,1} \lor u_{m,2} \lor u_{m,3}) $$
+
+\textbf{Esempio di costruzione:} Sia $p = (x_1 \lor x_2' \lor x_3) \land (x_1' \lor x_2 \lor x_4')$. \\
+Costruiamo il grafo corrispondente $G(p)$ con la seguente logica:
+\begin{center}
+\begin{tikzpicture}[scale=0.85, transform shape,
+    node/.style={circle, draw, thick, minimum size=0.8cm, inner sep=1pt},
+    var/.style={cyan!80!black, thick},
+    tri/.style={green!70!black, thick},
+    link/.style={orange!90!black, thick}
+]
+    % Variabili (coppie legate)
+    \node[node] (x1) at (0, 2) {$x_1$};
+    \node[node] (nx1) at (1.5, 2) {$x_1'$};
+    \draw[var] (x1) -- (nx1);
+
+    \node[node] (x2) at (3.5, 2) {$x_2$};
+    \node[node] (nx2) at (5, 2) {$x_2'$};
+    \draw[var] (x2) -- (nx2);
+
+    \node[node] (x3) at (7, 2) {$x_3$};
+    \node[node] (nx3) at (8.5, 2) {$x_3'$};
+    \draw[var] (x3) -- (nx3);
+
+    \node[node] (x4) at (10.5, 2) {$x_4$};
+    \node[node] (nx4) at (12, 2) {$x_4'$};
+    \draw[var] (x4) -- (nx4);
+
+    % Triangolo 1
+    \node[node] (u11) at (1.5, 0) {$u_{1,1}$};
+    \node[node] (u12) at (3.5, 0) {$u_{1,2}$};
+    \node[node] (u13) at (2.5, -1.5) {$u_{1,3}$};
+    \draw[tri] (u11) -- (u12) -- (u13) -- (u11);
+
+    % Triangolo 2
+    \node[node] (u21) at (8.5, 0) {$u_{2,1}$};
+    \node[node] (u22) at (10.5, 0) {$u_{2,2}$};
+    \node[node] (u23) at (9.5, -1.5) {$u_{2,3}$};
+    \draw[tri] (u21) -- (u22) -- (u23) -- (u21);
+
+    % Collegamenti tra triangoli e variabili (Link arancioni)
+    % Clausola 1: x1, x2', x3
+    \draw[link] (u11) -- (x1);
+    \draw[link] (u12) -- (nx2);
+    \draw[link] (u13) to[out=0, in=250] (x3); % Curva morbida per aggirare il triangolo
+
+    % Clausola 2: x1', x2, x4'
+    % Curviamo verso l'alto (bend right) per passare comodamente nello spazio vuoto tra le due righe
+    \draw[link] (u21) to (nx1);
+    \draw[link] (u22) to (x2);
+    \draw[link] (u23) to[bend right=15] (nx4);
+
+\end{tikzpicture}
+\end{center}
+
+\textbf{Osservazione:} In un Vertex Cover di $G(p)$ ci devono essere almeno $n + 2m$ vertici. 
+\begin{itemize}
+    \item $n$ vertici per coprire gli archi orizzontali in alto (dobbiamo scegliere per forza uno tra $x_i$ e $x_i'$).
+    \item $2m$ vertici per coprire i triangoli (per coprire un triangolo interamente servono almeno 2 dei suoi vertici).
+\end{itemize}
+
+Facciamo vedere che $p$ è soddisfacibile $\iff G(p)$ ha un Vertex Cover di cardinalità $K(p) = n + 2m$.
+
+$\implies$ Sia $t$ un assegnamento tale che $t(p) = 1$.
+\begin{itemize}
+    \item Per ogni $i=1 \dots n$, scegliamo il nodo $x_i$ se $t(x_i) = 1$, oppure il nodo $x_i'$ se $t(x_i) = 0$.
+    \item Per ogni clausola, individuiamo un letterale che la soddisfa (essendo $t(p)=1$, ce n'è almeno uno) e scegliamo i rimanenti 2 nodi del triangolo da mettere nel V.C.
+\end{itemize}
+L'insieme dei vertici scelti ha cardinalità esattamente $n + 2m$ ed è un Vertex Cover valido per $G(p)$.
+
+$\impliedby$ Sia $C$ un Vertex Cover valido di cardinalità $n+2m$. 
+Poiché per coprire i "baffi" orizzontali in alto abbiamo scelto esattamente un nodo tra ogni coppia $(x_i, x_i')$, definiamo l'assegnamento $t$:
+$$ 
+t(x_i) = 
+\begin{cases} 
+1 & \text{se } x_i \in C \\ 
+0 & \text{se } x_i' \in C 
+\end{cases} 
+$$
+Tale assegnamento $t$ garantisce che $p$ sia soddisfatto.
