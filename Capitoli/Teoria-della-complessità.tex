@@ -1220,3 +1220,433 @@ t(x_i) =
 \end{cases} 
 $$
 Tale assegnamento $t$ garantisce che $p$ sia soddisfatto.
+
+
+
+
+
+
+
+
+
+
+
+
+
+%27/04/2026
+\vspace{0.4cm}
+\subsection{Problema della CLIQUE}
+
+\textbf{Definizione (CLIQUE):} Dato un grafo non orientato $G$ e un intero $K$, determinare se esiste un sottografo completo di $G$ avente $K$ vertici.
+
+\begin{center}
+\begin{tikzpicture}[scale=1.5, transform shape]
+    % Vertici della clique
+    \node[circle, fill=black, inner sep=1.5pt] (A) at (0, 0.5) {};
+    \node[circle, fill=black, inner sep=1.5pt] (B) at (1, 1) {};
+    \node[circle, fill=black, inner sep=1.5pt] (C) at (1, -0.5) {};
+    \node[circle, fill=black, inner sep=1.5pt] (D) at (1.8, 0.25) {};
+    
+    % Vertice esterno
+    \node[circle, fill=black, inner sep=1.5pt] (E) at (-1, 0.5) {};
+    \node[circle, fill=black, inner sep=1.5pt] (F) at (-1, -0.5) {};
+    \node[circle, fill=black, inner sep=1.5pt] (G) at (0.3, -1.2) {};
+
+    % Archi della clique
+    \draw[thick] (A) -- (B);
+    \draw[thick] (A) -- (C);
+    \draw[thick] (A) -- (D);
+    \draw[thick] (B) -- (C);
+    \draw[thick] (B) -- (D);
+    \draw[thick] (C) -- (D);
+
+    % Archi esterni
+    \draw[thick] (A) -- (E);
+    \draw[thick] (C) -- (F);
+    \draw[thick] (C) -- (G);
+\end{tikzpicture}
+\end{center}
+
+\textbf{Osservazione:} CLIQUE $\in \mathcal{NP}$.
+
+\vspace{0.6cm}
+\textbf{Proposizione:} CLIQUE è NP-difficile.
+
+\vspace{0.2cm}
+\textit{Dimostrazione:} \\
+Descriviamo una riduzione polinomiale da 3-SAT a CLIQUE.
+
+Sia $P$ un polinomio booleano in 3-CNF:
+$$P = u_1 \land u_2 \land \dots \land u_K$$
+$$u_i = (u_{i,1} \lor u_{i,2} \lor u_{i,3})$$
+
+\textbf{Esempio di riduzione:} \\
+Consideriamo il seguente polinomio con un possibile assegnamento ($x_1 \to 1$, $x_2 \to 0$, $x_3 \to 1$, $x_4 \to 0$):
+$$ (\framebox{$x_1$} \lor x_2' \lor x_3) \land (x_1' \lor x_2 \lor \framebox{$x_4'$}) \land (x_2 \lor \framebox{$x_3$} \lor x_4') $$
+
+Costruiamo il grafo corrispondente $G(P) = (V,E)$ secondo le seguenti regole:
+\begin{itemize}
+    \item $V$: un vertice per ciascun letterale di ogni clausola.
+    \item $E$: un lato (arco) tra ogni coppia di vertici, \textbf{tranne}:
+    \begin{enumerate}
+        \item Vertici della stessa clausola.
+        \item Vertici che rappresentano letterali opposti (es. $x_1$ e $x_1'$).
+    \end{enumerate}
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2, transform shape,
+    node/.style={circle, draw, thick, minimum size=1cm, inner sep=1pt}]
+    
+    % Vertici clausola 1
+    \node[node] (u11) at (0, 1.5) {$u_{1,1}$};
+    \node[node] (u12) at (0, 0) {$u_{1,2}$};
+    \node[node] (u13) at (0, -1.5) {$u_{1,3}$};
+    
+    % Vertici clausola 2
+    \node[node] (u21) at (4, 1.5) {$u_{2,1}$};
+    \node[node] (u22) at (4, 0) {$u_{2,2}$};
+    \node[node] (u23) at (4, -1.5) {$u_{2,3}$};
+
+    % Archi 
+    \draw[thick] (u11) -- (u22);
+    \draw[thick] (u11) -- (u23);
+    
+    \draw[thick] (u12) -- (u21);
+    \draw[thick] (u12) -- (u23);
+    
+    \draw[thick] (u13) -- (u21);
+    \draw[thick] (u13) -- (u22);
+    \draw[thick] (u13) -- (u23); % <-- L'arco che avevi giustamente notato!
+
+    % Bordo grigio per raggruppare visivamente (come nell'immagine)
+    \draw[gray, thick, rounded corners=10pt] (-1.5, 2.5) rectangle (5.5, -2.5);
+\end{tikzpicture}
+\end{center}
+
+Si dimostra che: \\
+\textbf{$P$ è soddisfacibile $\iff G(P)$ ha un sottografo completo di cardinalità $K$.}
+
+$\implies$ Sia $t$ un assegnamento tale che $t(P) = 1$. \\
+Per ogni clausola di $P$, scegliamo un letterale soddisfatto da $t$, e consideriamo il sottografo di $G(P)$ fondato dai vertici che rappresentano tali letterali.
+
+$\impliedby$ Sia $\{v_1, \dots, v_K\}$ un sottografo completo di $G(P)$. \\
+$\forall i = 1, \dots, K$, sia $u^{(i)}$ il letterale associato a $v_i$. Definiamo un assegnamento $t$ tale che $t(u^{(i)}) = 1$.
+\begin{itemize}
+    \item $t$ è ben definito (perché nel sottografo completo non ci sono archi tra letterali opposti, quindi non assegneremo mai 1 sia a $x$ che a $x'$).
+    \item $t$ soddisfa $P$ (perché abbiamo scelto esattamente un letterale per ogni clausola).
+\end{itemize}
+
+
+\vspace{0.8cm}
+
+\subsection{Problema del Circuito Hamiltoniano (HAM)}
+
+\textbf{Proposizione:} HAM è NP-difficile.
+
+\vspace{0.2cm}
+\textit{Dimostrazione:} \\
+Descriviamo una riduzione da 3-SAT a HAM.
+
+Sia $P = u_1 \land u_2 \land \dots \land u_m$, dove le clausole sono $u_i = (u_{i,1} \lor u_{i,2} \lor u_{i,3})$. \\
+Sia $V = \{x_1, \dots, x_n\}$ l'insieme delle variabili.
+
+Per ogni variabile $x_i$, costruiamo il seguente "gadget":
+\begin{center}
+\begin{tikzpicture}[scale=1, transform shape, >=stealth]
+    % Nodi
+    \node (e) at (0, 2) {$e_i$};
+    \node (o) at (0, -4) {$o_i$};
+    
+    \node (t0) at (-1.5, 1) {$t_{i,0}$};
+    \node (f0) at (1.5, 1) {$f_{i,0}$};
+    
+    \node (t1) at (-1.5, -0.5) {$t_{i,1}$};
+    \node (f1) at (1.5, -0.5) {$f_{i,1}$};
+    
+    \node (t2) at (-1.5, -2) {$t_{i,2}$};
+    \node (f2) at (1.5, -2) {$f_{i,2}$};
+
+    % Archi da e_i
+    \draw[->, thick] (e) -- (t0);
+    \draw[->, thick] (e) -- (f0);
+    
+    % Archi orizzontali (doppia direzione)
+    \draw[<->, thick] (t0) -- (f0);
+    \draw[<->, thick] (t1) -- (f1);
+    \draw[<->, thick] (t2) -- (f2);
+    
+    % Archi incrociati
+    \draw[->, thick] (t0) -- (f1);
+    \draw[->, thick] (f0) -- (t1);
+    
+    \draw[->, thick] (t1) -- (f2);
+    \draw[->, thick] (f1) -- (t2);
+    
+    % Puntini di sospensione
+    \node at (-1.5, -2.8) {$\vdots$};
+    \node at (1.5, -2.8) {$\vdots$};
+    \node at (0, -2.8) {$\vdots$};
+
+    % Livello finale r_i
+    \node (tr) at (-1.5, -3.5) {$t_{i,r_i}$};
+    \node (fr) at (1.5, -3.5) {$f_{i,r_i}$};
+    \draw[<->, thick] (tr) -- (fr);
+
+    % Archi verso o_i
+    \draw[->, thick] (tr) -- (o);
+    \draw[->, thick] (fr) -- (o);
+\end{tikzpicture}
+\end{center}
+
+Quanti cammini hamiltoniani ci sono in questo singolo gadget (da $e_i$ a $o_i$)? \textbf{\fbox{2}} \\
+(Uno percorrendo la colonna sinistra-destra e l'altro destra-sinistra).
+
+Colleghiamo in serie tutti i gadget delle variabili:
+\begin{center}
+\begin{tikzpicture}[scale=0.8, transform shape, >=stealth]
+    % Nodi e gadget schematizzati
+    \node[circle, fill=black, inner sep=1pt, label=right:$e_1$] (e1) at (0, 0) {};
+    \node[draw, regular polygon, regular polygon sides=6, minimum size=1.5cm] (g1) at (0, -1) {};
+    \node[circle, fill=black, inner sep=1pt, label=right:$o_1$] (o1) at (0, -2) {};
+    
+    \node[circle, fill=black, inner sep=1pt, label=right:$e_2$] (e2) at (0, -3) {};
+    \node[draw, regular polygon, regular polygon sides=6, minimum size=1.5cm] (g2) at (0, -4) {};
+    \node[circle, fill=black, inner sep=1pt, label=right:$o_2$] (o2) at (0, -5) {};
+
+    \node at (0, -6) {$\vdots$};
+
+    \node[circle, fill=black, inner sep=1pt, label=right:$e_n$] (en) at (0, -7) {};
+    \node[draw, regular polygon, regular polygon sides=6, minimum size=1.5cm] (gn) at (0, -8) {};
+    \node[circle, fill=black, inner sep=1pt, label=right:$o_n$] (on) at (0, -9) {};
+
+    % Connessioni in serie
+    \draw[->, thick] (o1) -- (e2);
+    \draw[->, thick] (o2) -- (0, -5.5);
+    \draw[->, thick] (0, -6.5) -- (en);
+
+    % Ritorno per chiudere il circuito
+    \draw[->, thick] (on) .. controls (3, -9) and (3, 0) .. (e1);
+\end{tikzpicture}
+\end{center}
+
+Quanti circuiti hamiltoniani ci sono nel grafo totale senza clausole? \textbf{\fbox{$2^n$}}
+
+Definiamo $r_i$ = $\max$ tra le occorrenze di $x_i$ e $x_i'$ in $P$.
+
+
+\vspace{0.8cm}
+
+\subsubsection{Costruzione del Grafo HAM Completo (Esempio)}
+
+\textbf{Esempio:}
+$$ p = (x_1 \lor x_2 \lor x_3') \land (x_1' \lor x_2 \lor x_4') \land (x_1 \lor x_2' \lor x_4) \land (x_1' \lor x_3 \lor x_4) $$
+
+Devo sapere quanti nodi devo scrivere, cioè quanto vale $r_i$ (che è il massimo tra le occorrenze di $x_i$ e $x_i'$ in $p$). \\
+\textbf{Esempio per $x_1$:} \\
+$x_1$ appare 2 volte, $x_1'$ appare 2 volte $\implies r_1 = 2 \implies$ Sono 3 coppie di nodi centrali (indici 0, 1, 2).
+
+\vspace{0.4cm}
+Prima di vedere il grafo totale, definiamo il \textbf{gadget per la clausola}: ne inseriamo uno per ogni clausola e \textit{ci entriamo solo se è vera la clausola}.
+
+\begin{center}
+\begin{tikzpicture}[scale=1, transform shape, >=stealth]
+    % Contenitore del gadget clausola
+    \draw[thick, rounded corners=15pt] (-1, 1.5) rectangle (7, -1.5);
+    \node[above, text=gray] at (3, 1.5) {Gadget (uno per ogni clausola)};
+
+    % Nodi interni
+    \node (in1) at (0, 0.5) {$in_{1,1}$};
+    \node (in2) at (3, 0.5) {$in_{1,2}$};
+    \node (in3) at (6, 0.5) {$in_{1,3}$};
+    
+    \node (out1) at (0, -0.5) {$out_{1,1}$};
+    \node (out2) at (3, -0.5) {$out_{1,2}$};
+    \node (out3) at (6, -0.5) {$out_{1,3}$};
+
+    % Connessioni interne
+    \draw[->, thick] (in1) -- (in2);
+    \draw[->, thick] (in2) -- (in3);
+    
+    \draw[<-, thick] (out1) -- (out2);
+    \draw[<-, thick] (out2) -- (out3);
+
+    \draw[->, thick] (in1) -- (out1);
+    \draw[->, thick] (in2) -- (out2);
+    \draw[->, thick] (in3) -- (out3);
+    
+    \draw[->, thick] (in3) to[out=0, in=0, looseness=1.5] (6.5, -1) to[out=180, in=270] (out1);
+    \draw[->, thick] (out3) to[out=0, in=0, looseness=1.5] (6.5, 1) to[out=180, in=90] (in1);
+    
+    % Archi verso le variabili
+    \draw[<-, thick] (in1) -- ++(0, 1.5);
+    \draw[<-, thick] (in2) -- ++(0, 1.5);
+    \draw[<-, thick] (in3) -- ++(0, 1.5);
+    
+    \draw[->, thick] (out1) -- ++(0, -1.5);
+    \draw[->, thick] (out2) -- ++(0, -1.5);
+    \draw[->, thick] (out3) -- ++(0, -1.5);
+\end{tikzpicture}
+\end{center}
+
+Di seguito è riportata la costruzione fedele del grafo completo per il polinomio dell'esempio (mostrando la connessione alla prima clausola $(x_1 \lor x_2 \lor x_3')$).
+
+\begin{center}
+\begin{tikzpicture}[scale=0.75, transform shape, >=stealth,
+    varNode/.style={inner sep=2pt},
+    edge/.style={->, thick},
+    biEdge/.style={<->, thick}]
+    
+    % Sfondo colorato come nell'immagine stampata
+    \fill[red!10!white, rounded corners] (-2, 2) rectangle (14, -13);
+
+    % === VARIABILE x1 ===
+    \node[varNode] (e1) at (0, 0) {$\mathbf{e_1}$};
+    \node[left=0.5cm of e1] {$\mathbf{x_1}$};
+    \node[varNode] (t10) at (-1.5, -1) {$\mathbf{t_{1,0}}$}; \node[varNode] (f10) at (1.5, -1) {$\mathbf{f_{1,0}}$};
+    \node[varNode] (t11) at (-1.5, -2.5) {$\mathbf{t_{1,1}}$}; \node[varNode] (f11) at (1.5, -2.5) {$\mathbf{f_{1,1}}$};
+    \node[varNode] (t12) at (-1.5, -4) {$\mathbf{t_{1,2}}$}; \node[varNode] (f12) at (1.5, -4) {$\mathbf{f_{1,2}}$};
+    \node[varNode] (o1) at (0, -5.5) {$\mathbf{o_1}$};
+    
+    \draw[edge] (e1) -- (t10); \draw[edge] (e1) -- (f10);
+    \draw[biEdge] (t10) -- (f10); \draw[biEdge] (t11) -- (f11); \draw[biEdge] (t12) -- (f12);
+    \draw[edge] (t10) -- (f11); \draw[edge] (f10) -- (t11);
+    \draw[edge] (t11) -- (f12); \draw[edge] (f11) -- (t12);
+    \draw[edge] (t12) -- (o1); \draw[edge] (f12) -- (o1);
+
+    % === VARIABILE x2 ===
+    \node[varNode] (e2) at (0, -7.5) {$\mathbf{e_2}$};
+    \node[left=0.5cm of e2] {$\mathbf{x_2}$};
+    \node[varNode] (t20) at (-1.5, -8.5) {$\mathbf{t_{2,0}}$}; \node[varNode] (f20) at (1.5, -8.5) {$\mathbf{f_{2,0}}$};
+    \node[varNode] (t21) at (-1.5, -10) {$\mathbf{t_{2,1}}$}; \node[varNode] (f21) at (1.5, -10) {$\mathbf{f_{2,1}}$};
+    \node[varNode] (t22) at (-1.5, -11.5) {$\mathbf{t_{2,2}}$}; \node[varNode] (f22) at (1.5, -11.5) {$\mathbf{f_{2,2}}$};
+    \node[varNode] (o2) at (0, -12.5) {$\mathbf{o_2}$};
+    
+    \draw[edge] (e2) -- (t20); \draw[edge] (e2) -- (f20);
+    \draw[biEdge] (t20) -- (f20); \draw[biEdge] (t21) -- (f21); \draw[biEdge] (t22) -- (f22);
+    \draw[edge] (t20) -- (f21); \draw[edge] (f20) -- (t21);
+    \draw[edge] (t21) -- (f22); \draw[edge] (f21) -- (t22);
+    \draw[edge] (t22) -- (o2); \draw[edge] (f22) -- (o2);
+
+    % === VARIABILE x3 ===
+    \node[varNode] (e3) at (10, 0) {$\mathbf{e_3}$};
+    \node[left=0.5cm of e3] {$\mathbf{x_3}$};
+    \node[varNode] (t30) at (8.5, -1) {$\mathbf{t_{3,0}}$}; \node[varNode] (f30) at (11.5, -1) {$\mathbf{f_{3,0}}$};
+    \node[varNode] (t31) at (8.5, -2.5) {$\mathbf{t_{3,1}}$}; \node[varNode] (f31) at (11.5, -2.5) {$\mathbf{f_{3,1}}$};
+    \node[varNode] (o3) at (10, -4) {$\mathbf{o_3}$};
+    
+    \draw[edge] (e3) -- (t30); \draw[edge] (e3) -- (f30);
+    \draw[biEdge] (t30) -- (f30); \draw[biEdge] (t31) -- (f31);
+    \draw[edge] (t30) -- (f31); \draw[edge] (f30) -- (t31);
+    \draw[edge] (t31) -- (o3); \draw[edge] (f31) -- (o3);
+
+    % === VARIABILE x4 ===
+    \node[varNode] (e4) at (10, -7.5) {$\mathbf{e_4}$};
+    \node[left=0.5cm of e4] {$\mathbf{x_4}$};
+    \node[varNode] (t40) at (8.5, -8.5) {$\mathbf{t_{4,0}}$}; \node[varNode] (f40) at (11.5, -8.5) {$\mathbf{f_{4,0}}$};
+    \node[varNode] (t41) at (8.5, -10) {$\mathbf{t_{4,1}}$}; \node[varNode] (f41) at (11.5, -10) {$\mathbf{f_{4,1}}$};
+    \node[varNode] (t42) at (8.5, -11.5) {$\mathbf{t_{4,2}}$}; \node[varNode] (f42) at (11.5, -11.5) {$\mathbf{f_{4,2}}$};
+    \node[varNode] (o4) at (10, -12.5) {$\mathbf{o_4}$};
+    
+    \draw[edge] (e4) -- (t40); \draw[edge] (e4) -- (f40);
+    \draw[biEdge] (t40) -- (f40); \draw[biEdge] (t41) -- (f41); \draw[biEdge] (t42) -- (f42);
+    \draw[edge] (t40) -- (f41); \draw[edge] (f40) -- (t41);
+    \draw[edge] (t41) -- (f42); \draw[edge] (f41) -- (t42);
+    \draw[edge] (t42) -- (o4); \draw[edge] (f42) -- (o4);
+
+    % === CLAUSOLA CENTRALE C1 ===
+    \node[varNode] (in1) at (3.5, -3.5) {$\mathbf{in_{1,1}}$};
+    \node[varNode] (in2) at (5.5, -3.5) {$\mathbf{in_{1,2}}$};
+    \node[varNode] (in3) at (7.5, -3.5) {$\mathbf{in_{1,3}}$};
+    
+    \node[varNode] (out1) at (3.5, -5.5) {$\mathbf{out_{1,1}}$};
+    \node[varNode] (out2) at (5.5, -5.5) {$\mathbf{out_{1,2}}$};
+    \node[varNode] (out3) at (7.5, -5.5) {$\mathbf{out_{1,3}}$};
+    
+    \draw[edge] (in1) -- (in2); \draw[edge] (in2) -- (in3);
+    \draw[edge] (out3) -- (out2); \draw[edge] (out2) -- (out1);
+    
+    \draw[edge] (in1) -- (out1); \draw[edge] (in2) -- (out2); \draw[edge] (in3) -- (out3);
+    
+    \draw[edge] (in3) to[out=20, in=0, looseness=1.5] (8.5, -4.5) to[out=180, in=160, looseness=1.5] (out1);
+    \draw[edge] (out3) to[out=340, in=0, looseness=1.5] (8.5, -4.5) to[out=180, in=200, looseness=1.5] (in1);
+
+    % === COLLEGAMENTI VARIABILI -> CLAUSOLE ===
+    % C1 = (x1 OR x2 OR x3')
+    % x1 è positivo -> t va in 'in', 'out' va in f
+    \draw[edge] (t10) -- ++(0.8,0) |- (in1);
+    \draw[edge] (out1) -- ++(0,-1.5) -| (f10);
+    
+    % x2 è positivo -> t va in 'in', 'out' va in f
+    \draw[edge] (t20) -- ++(0.8,0) |- (in2);
+    \draw[edge] (out2) -- ++(0,-1.5) -| (f20);
+    
+    % x3' è negativo -> f va in 'in', 'out' va in t
+    \draw[edge] (f30) -- ++(-0.8,0) |- (in3);
+    \draw[edge] (out3) -- ++(0,-1.5) -| (t30);
+
+    % === COLLEGAMENTI SERIE GLOBALI ===
+    \draw[edge] (o1) -- (e2);
+    \draw[edge] (o2) -- ++(0,-0.4) -- ++(13.5,0) |- (e3); % o2 -> e3 wraparound
+    \draw[edge] (o3) -- (e4);
+    \draw[edge] (o4) -- ++(0,-0.4) -- ++(-11.5,0) |- (e1); % o4 -> e1 wraparound
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.8cm}
+
+\subsection{Problema dell'Insieme Indipendente (IS)}
+
+\textbf{Definizione:} Sia $G = (V,E)$ un grafo non orientato. Un sottoinsieme $I \subseteq V$ si dice \textbf{indipendente} quando $\forall x, y \in I$, si ha $\{x, y\} \notin E$. \\
+\textit{(Ovvero, è un sottoinsieme di vertici senza lati che li collegano).}
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2, transform shape]
+    % Nodo centrale
+    \node[circle, draw, fill=gray!50, inner sep=1.5pt] (center) at (0, 0) {};
+    
+    % Nodi dell'insieme indipendente
+    \node[circle, draw, fill=black, inner sep=1.5pt] (top) at (0, 1) {};
+    \node[circle, draw, fill=black, inner sep=1.5pt] (right) at (1, -0.2) {};
+    \node[circle, draw, fill=black, inner sep=1.5pt] (bottom) at (0.2, -1) {};
+
+    % Archi verso il nodo centrale
+    \draw[thick, gray] (center) -- (top);
+    \draw[thick, gray] (center) -- (right);
+    \draw[thick, gray] (center) -- (bottom);
+
+    % Evidenziazione Insieme Indipendente
+    \draw[thick] (top) circle (5pt);
+    \draw[thick] (right) circle (5pt);
+    \draw[thick] (bottom) circle (5pt);
+    
+    \node[right=1.2cm of right, text=gray, align=left, font=\footnotesize] {I tre vertici cerchiati \\ formano un Insieme Indipendente \\ perché non ci sono archi tra di loro.};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{Definizione del Problema (IS):} Dato un grafo non orientato $G$ e un intero $K$, determinare se $G$ contiene un sottoinsieme indipendente di cardinalità $K$.
+
+\vspace{0.6cm}
+\textbf{Riduzione polinomiale da CLIQUE a IS:}
+
+Mostriamo come trasformare un'istanza del problema CLIQUE in un'istanza del problema IS.
+
+$$ (G, K) \quad \longrightarrow \quad (\tilde{G}, K) $$
+\textit{(Istanza del problema CLIQUE)} \hspace{1cm} \textit{(Istanza per IS)}
+
+\vspace{0.3cm}
+Definiamo il nuovo grafo $\tilde{G} = (\tilde{V}, \tilde{E})$ dove:
+\begin{itemize}
+    \item $\tilde{V} = V$ \quad (i vertici rimangono esattamente gli stessi)
+    \item $\tilde{E} = \text{complementare di } E = \binom{V}{2} \setminus E$ \quad (gli archi di $\tilde{G}$ sono tutti e soli gli archi \textbf{mancanti} in $G$)
+\end{itemize}
+\textit{Nota: la notazione $\binom{V}{2}$ indica l'insieme di tutte le possibili coppie di vertici, ovvero tutti i possibili archi di un grafo completo.}
+
+\vspace{0.4cm}
+Per la costruzione stessa del grafo complementare, si deduce immediatamente l'equivalenza:
+\begin{center}
+    $G$ ha un sottografo completo di cardinalità $K$ \\
+    $\Updownarrow$ \\
+    $\tilde{G}$ ha un sottoinsieme indipendente di cardinalità $K$
+\end{center}
