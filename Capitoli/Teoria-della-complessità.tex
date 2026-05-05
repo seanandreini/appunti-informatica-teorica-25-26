@@ -1650,3 +1650,306 @@ Per la costruzione stessa del grafo complementare, si deduce immediatamente l'eq
     $\Updownarrow$ \\
     $\tilde{G}$ ha un sottoinsieme indipendente di cardinalità $K$
 \end{center}
+
+
+
+
+
+
+
+
+
+
+
+%04/05/2026
+\vspace{0.8cm}
+
+\subsection{Problema 2-SAT}
+
+\textbf{Definizione:} Dato un polinomio booleano $p$ in 2-CNF, determinare se $p$ è soddisfacibile.
+
+Sia $p = u_1 \land u_2 \land \dots \land u_k$, dove ogni clausola è del tipo $u_i = v_{i,1} \lor v_{i,2}$.
+
+Costruiamo un grafo orientato $G(p)$:
+\begin{itemize}
+    \item \textbf{Vertici:} Per ogni variabile $x$ che compare in $p$, inseriamo 2 vertici: $x$ e $x'$.
+    \item \textbf{Archi:} Per ogni clausola $u_i$, inseriamo 2 archi.
+    Poiché $u_{i,1} \lor u_{i,2}$ equivale logicamente a $u_{i,1}' \to u_{i,2}$ e $u_{i,2}' \to u_{i,1}$, aggiungiamo proprio questi archi.
+\end{itemize}
+
+\vspace{0.5cm}
+\textbf{Esempio:}
+$$ p = (x_1 \lor x_2') \land (x_1' \lor x_3) \land (x_2' \lor x_3') $$
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=2.5cm and 2cm,
+    vertex/.style={circle, draw, minimum size=0.8cm, inner sep=0pt, font=\large},
+    edge/.style={-Latex, thick}
+]
+    % Nodes
+    \node[vertex] (x1) {$x_1$};
+    \node[vertex, below=0.5cm of x1] (x2) {$x_2$};
+    \node[vertex, below=0.5cm of x2] (x3) {$x_3$};
+    
+    \node[vertex, right=3cm of x1] (nx1) {$x_1'$};
+    \node[vertex, right=3cm of x2] (nx2) {$x_2'$};
+    \node[vertex, right=3cm of x3] (nx3) {$x_3'$};
+
+    % Edges for (x1 \lor x_2') -> x1' -> x2' and x2 -> x1
+    \draw[edge] (nx1) to[bend left=15] (nx2);
+    \draw[edge] (x2) to[bend left=15] (x1);
+    
+    % Edges for (x1' \lor x3) -> x1 -> x3 and x3' -> x1'
+    % Curviamo molto verso l'esterno per aggirare la riga centrale
+    \draw[edge] (x1) to[bend right=45] (x3);
+    \draw[edge] (nx3) to[bend right=45] (nx1);
+
+    % Edges for (x2' \lor x3') -> x2 -> x3' and x3 -> x2'
+    % Incrocio centrale morbido
+    \draw[edge] (x2) to[bend right=10] (nx3);
+    \draw[edge] (x3) to[bend right=10] (nx2);
+    
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+\textbf{Notazione:} Siano $\alpha, \beta$ vertici. Scriviamo "$\alpha \leadsto \beta$" per significare "esiste un cammino da $\alpha$ a $\beta$".
+
+\textbf{Osservazione:} Se $\alpha \leadsto \beta$, allora $\beta' \leadsto \alpha'$.
+Infatti, se esiste il cammino:
+$$ \alpha \to \gamma_1 \to \gamma_2 \to \gamma_3 \to \dots \to \beta $$
+Esisterà simmetricamente il cammino contrario negato:
+$$ \alpha' \leftarrow \gamma_1' \leftarrow \gamma_2' \leftarrow \gamma_3' \leftarrow \dots \leftarrow \beta' $$
+
+\vspace{0.5cm}
+\textbf{Proposizione:} 
+$p$ è soddisfacibile $\iff$ non esiste alcuna variabile $x$ in $p$ tale che in $G(p)$ si abbia contemporaneamente $x \leadsto x'$ e $x' \leadsto x$.
+
+\textit{Dimostrazione ($\implies$):} 
+Sia $x$ tale che $x \leadsto x'$ e $x' \leadsto x$. Facciamo vedere che in questo caso $p$ non è soddisfacibile.
+Sia $t$ un generico assegnamento di verità.
+\begin{enumerate}
+    \item Se $t(x) = 1$: \\
+    Consideriamo il cammino $x \leadsto x'$:
+    $$ x \to \gamma_1 \to \dots \to \alpha \to \beta \to \dots \to \gamma_n \to x' $$
+    Dato che partiamo da un valore vero ($t(x)=1$) e arriviamo a un valore falso ($t(x')=0$), ci deve essere per forza un arco intermedio $\alpha \to \beta$ in cui si passa da 1 a 0. Ovvero tale che $t(\alpha) = 1$ e $t(\beta) = 0$. \\
+    L'arco $\alpha \to \beta$ deriva dalla clausola logica $\alpha' \lor \beta$.
+    Ma se $t(\alpha) = 1$, allora $t(\alpha') = 0$. Essendo anche $t(\beta) = 0$, la clausola $\alpha' \lor \beta$ valuta a Falso. \\
+    Quindi in $p$ c'è la clausola $\alpha' \lor \beta$ che non è soddisfatta da $t \implies p$ non può essere soddisfatto.
+    
+    \item Se $t(x) = 0$: \\
+    Il ragionamento è del tutto analogo ma partendo dal cammino $x' \leadsto x$, portando allo stesso modo a un assurdo.
+\end{enumerate}
+
+\vspace{0.5cm}
+\textit{Dimostrazione ($\impliedby$):}
+Senza perdita di generalità, supponiamo che esista un letterale $\alpha$ tale che in $p$ compaiono sia $\alpha$ che $\alpha'$ (altrimenti $p$ sarebbe banalmente soddisfacibile).
+
+Se, per assurdo, per tutti i letterali $\alpha$ tali che $\alpha, \alpha'$ compaiono in $p$, si avesse $\alpha \leadsto \alpha'$, allora se $\beta$ è uno di questi, avremmo $\beta \leadsto \beta'$ e contemporaneamente $\beta' \leadsto \beta$ (Assurdo, perché andrebbe contro l'ipotesi iniziale).
+
+Pertanto esiste un letterale $\alpha$ di $p$ tale che $\alpha'$ è anch'esso letterale di $p$ e \textbf{non} c'è alcun cammino da $\alpha$ a $\alpha'$ ($\alpha \not\leadsto \alpha'$).
+
+Sia $\alpha$ uno di tali letterali. Definiamo l'assegnamento $t$ ponendo:
+\begin{enumerate}
+    \item $t(\alpha) = 1$
+    \item $\forall \beta$ tale che $\alpha \leadsto \beta$, poniamo $t(\beta) = 1$
+\end{enumerate}
+
+\textbf{Osservazione:} Verifichiamo che fin qui $t$ è ben definito, perché non può accadere che debba porre $t(\beta') = 1$, in quanto $\alpha \not\leadsto \beta'$.
+Infatti, se per assurdo $\alpha \leadsto \beta'$ si avrebbe di conseguenza $\beta \leadsto \alpha'$.
+Inoltre, combinando i cammini: se $\alpha \leadsto \beta$ e $\beta \leadsto \alpha'$, si otterrebbe per transitività $\alpha \leadsto \alpha'$, che è un assurdo per come abbiamo scelto $\alpha$.
+
+\begin{center}
+\begin{tikzpicture}
+    \node (a) at (0,0) {$\alpha$};
+    \node (b) at (2,0.5) {$\beta$};
+    \node (na) at (4,0) {$\alpha'$};
+    \node (nb) at (2,-0.5) {$\beta'$};
+
+    \draw[-Latex] (a) -- (b) node[midway, above] {$\leadsto$};
+    \draw[-Latex] (b) -- (na) node[midway, above] {$\leadsto$};
+    
+    \draw[-Latex, dashed, red] (a) -- (nb) node[midway, below] {$\leadsto$};
+    
+    \node at (2, -1.2) {$\alpha \leadsto \alpha'$ \textbf{ASSURDO}};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.6cm}
+\textbf{Algoritmo Deterministico Polinomiale per decidere se $p$ è soddisfacibile}
+
+Per determinare se $p$ è soddisfacibile:
+Dato $p$:
+\begin{enumerate}
+    \item Costruisco $G(p)$.
+    \item Per ogni variabile $x$ di $p$, controllo se ci sono i cammini $x \leadsto x'$ e $x' \leadsto x$.
+    \item Se ci sono entrambi per una qualche variabile, allora $p$ non è soddisfacibile. Altrimenti, $p$ è soddisfacibile.
+\end{enumerate}
+
+Questo prova costruttivamente che \textbf{2-SAT $\in \mathcal{P}$}.
+
+
+\vspace{0.8cm}
+
+\subsection{Linguaggi NP-Intermedi (NPI)}
+
+Se $\mathcal{P} \neq \mathcal{NP}$:
+Esiste una classe di linguaggi chiamati NP-Intermedi, definiti come:
+$$ NPI = \mathcal{NP} \setminus (\mathcal{P} \cup NPC) $$
+
+\textbf{Teorema (Ladner):} 
+Se $\mathcal{P} \neq \mathcal{NP} \implies NPI \neq \emptyset$ (cioè questi linguaggi intermedi esistono).
+
+
+\vspace{0.8cm}
+
+\subsection{La classe co-NP}
+
+Sappiamo che $\mathcal{P}$ è chiuso rispetto alla complementazione.
+
+\textbf{Proposizione (domanda):} Anche $\mathcal{NP}$ è chiusa per complementazione? Ovvero, $\mathcal{NP} \stackrel{?}{=} co-\mathcal{NP}$.
+
+\textbf{Definizione:} 
+$$ co-\mathcal{NP} = \{ L \text{ linguaggio } | \text{ } L' \in \mathcal{NP} \} $$
+(Dove $L'$ è il linguaggio complemento).
+
+\textbf{Esempio:} UNSAT = Dato un polinomio booleano $p$, determinare se $p$ \textbf{non} è soddisfacibile.
+$$ \text{UNSAT} \in co-\mathcal{NP} $$
+
+\vspace{0.5cm}
+\textbf{Proposizione:} $\mathcal{NP} \neq co-\mathcal{NP} \implies \mathcal{P} \neq \mathcal{NP}$.
+
+\textit{Dimostrazione:} 
+Se per ipotesi $\mathcal{NP} \neq co-\mathcal{NP}$, sapendo già con certezza che $\mathcal{P} = co-\mathcal{P}$ (poiché la classe $\mathcal{P}$ è chiusa per complementazione), ne consegue logicamente che $\mathcal{P} \neq \mathcal{NP}$.
+
+\vspace{0.8cm}
+
+\textbf{Proposizione:} $L \in co-\mathcal{NP}$ e $L \in MPC \implies co-\mathcal{NP} = \mathcal{NP}$.
+
+\textit{Dimostrazione:}
+Dimostriamo le due inclusioni.
+
+\textbf{Parte 1: $co-\mathcal{NP} \subseteq \mathcal{NP}$}\\
+Sia $Q \in co-\mathcal{NP} \implies Q' \in \mathcal{NP}$.
+Poiché $L \in NPC$ (quindi NP-Completo), esiste una funzione $f$ di riduzione polinomiale da $Q'$ a $L$.
+Osserviamo che $f$ è \textbf{anche} riduzione polinomiale da $Q$ a $L' \in \mathcal{NP}$.
+
+Possiamo allora definire un algoritmo polinomiale non deterministico per decidere $Q$:
+Data una stringa $w$:
+\begin{enumerate}
+    \item Calcolo $f(w)$
+    \item Decido se $f(w) \in L'$
+\end{enumerate}
+Poiché $L \in co-\mathcal{NP}$, sappiamo per definizione che $L' \in \mathcal{NP}$. Quindi l'algoritmo sopra appartiene a $\mathcal{NP}$. Di conseguenza, $Q \in \mathcal{NP}$.
+Abbiamo provato che $co-\mathcal{NP} \subseteq \mathcal{NP}$.
+
+\textbf{Parte 2: $\mathcal{NP} \subseteq co-\mathcal{NP}$}\\
+Sia $Q \in \mathcal{NP} \implies Q' \in co-\mathcal{NP}$ (per definizione di co-NP).
+Dalla dimostrazione precedente sappiamo che se $Q' \in co-\mathcal{NP} \implies Q' \in \mathcal{NP}$.
+Se il complemento $Q'$ sta in $\mathcal{NP}$, allora per definizione $Q \in co-\mathcal{NP}$.
+
+Unendo le due parti, otteniamo che $co-\mathcal{NP} = \mathcal{NP}$.
+
+\vspace{0.5cm}
+\textbf{Osservazione:} 
+$$ \text{UNSAT} \in \mathcal{NP} \iff co-\mathcal{NP} = \mathcal{NP} $$
+
+\textit{Spiegazione:} Poiché UNSAT è un problema \textbf{co-NP-completo} (cioè tra i più difficili della sua classe), se dimostrassimo che appartiene a $\mathcal{NP}$, allora "trascinerebbe" con sé tutta la classe $co-\mathcal{NP}$, facendola collassare in un'uguaglianza con $\mathcal{NP}$.
+
+\vspace{0.4cm}
+\textbf{Schema della Riduzione per Complementi:}
+Il seguente diagramma mostra visivamente come si comportano le riduzioni con i linguaggi complemento (come visto nelle dimostrazioni precedenti): se una funzione mappa un linguaggio $Q$ nel linguaggio $L'$, essa mapperà in parallelo il complemento $Q'$ nel complemento $L$ (poiché il complemento del complemento torna all'originale).
+
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \draw (0,0) rectangle (10,5);
+    \node at (0.5, 4.5) {$\Sigma_Q^*$};
+    \node at (9.5, 4.5) {$\Sigma_L^*$};
+
+    \draw (2,2.5) ellipse (1cm and 2cm);
+    \draw (8,2.5) ellipse (1cm and 2cm);
+
+    \draw (1,2.5) -- (3,2.5);
+    \draw (7,2.5) -- (9,2.5);
+
+    \node at (2,3.5) {$Q'$};
+    \node at (2,1.5) {$Q$};
+
+    \node at (8,3.5) {$L$};
+    \node at (8,1.5) {$L'$};
+
+    \draw[-Latex] (3, 3.5) to[bend left=20] (7, 3.5);
+    \draw[-Latex] (3, 1.5) to[bend right=20] (7, 1.5);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.6cm}
+
+\subsubsection{Proprietà di Chiusura dei Linguaggi co-NP}
+
+Analizziamo alcune operazioni insiemistiche sui linguaggi $co-\mathcal{NP}$ attraverso dei pratici esercizi teorici sulle loro proprietà di chiusura.
+
+\textbf{Esercizio 1 (Intersezione):} 
+Dimostrare che se $L_1, L_2 \in co-\mathcal{NP}$, allora la loro intersezione $L_1 \cap L_2 \in co-\mathcal{NP}$.
+
+\textit{Svolgimento:}
+Per definizione di linguaggio complemento, sappiamo che $L_1', L_2' \in \mathcal{NP}$.
+Per le leggi di De Morgan, possiamo scrivere l'intersezione dei linguaggi originali come il complemento della loro unione:
+$$ L_1 \cap L_2 = (L_1' \cup L_2')' $$
+Sappiamo che la classe $\mathcal{NP}$ è chiusa rispetto all'unione, quindi l'unione di due linguaggi in $\mathcal{NP}$ produce ancora un linguaggio in $\mathcal{NP}$:
+$$ \underbrace{L_1'}_{\in \mathcal{NP}} \cup \underbrace{L_2'}_{\in \mathcal{NP}} \in \mathcal{NP} $$
+Di conseguenza, il complemento di questa unione apparterrà per definizione alla classe $co-\mathcal{NP}$. Pertanto, $(L_1' \cup L_2')' \in co-\mathcal{NP}$.
+
+\vspace{0.8cm}
+
+\textbf{Esercizio 2 (Differenza):}
+Assumendo che $L \in \mathcal{NP}$ e $L_1 \in co-\mathcal{NP}$ con l'ipotesi aggiuntiva che $L_1 \subseteq L$, dimostrare che:
+$$ L \setminus L_1 \in \mathcal{NP} $$
+
+\textit{Svolgimento:}
+Possiamo riscrivere l'operazione di differenza insiemistica come l'intersezione con il complemento del secondo insieme:
+$$ L \setminus L_1 = L \cap L_1' $$
+Sappiamo dalle ipotesi che $L \in \mathcal{NP}$. Inoltre, poiché $L_1 \in co-\mathcal{NP}$, per definizione il suo complemento $L_1'$ apparterrà alla classe $\mathcal{NP}$ (cioè $L_1' \in \mathcal{NP}$).
+Dato che l'intersezione di due linguaggi in $\mathcal{NP}$ è ancora un linguaggio in $\mathcal{NP}$ (poiché la classe $\mathcal{NP}$ è chiusa per l'intersezione), otteniamo:
+$$ \underbrace{L}_{\in \mathcal{NP}} \cap \underbrace{L_1'}_{\in \mathcal{NP}} \in \mathcal{NP} $$
+
+\vspace{0.4cm}
+\textbf{Osservazione Grafica:}
+Il seguente diagramma di Venn illustra visivamente i passaggi logici dell'Esercizio 2. 
+\begin{itemize}
+    \item Il rettangolo esterno \textbf{$\Sigma^*$} rappresenta l'universo (tutte le stringhe possibili per quel dato alfabeto).
+    \item L'ellisse più grande rappresenta l'insieme \textbf{$L$}, che si trova in $\mathcal{NP}$.
+    \item L'ellisse più piccola (bianca) al suo interno è l'insieme \textbf{$L_1$}, che è interamente contenuto in $L$ ($L_1 \subseteq L$).
+    \item L'area \textbf{tratteggiata} (simile a una ciambella) evidenzia il risultato dell'operazione $L \setminus L_1$. Prendendo tutti gli elementi dell'insieme $L$ e "scartando" quelli che appartengono a $L_1$ (che algebricamente corrisponde proprio all'intersezione tra $L$ e tutto ciò che sta \textit{fuori} da $L_1$, ovvero $L_1'$), otteniamo la regione tratteggiata. Questo conferma anche visivamente perché la scomposizione matematica usata nello svolgimento è corretta.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}
+    % Universo
+    \node at (0.2, 4.2) {$\Sigma^*$};
+    \draw (0,0) rectangle (6,4.5);
+    
+    % Insieme L
+    \draw (3,2.2) ellipse (1.5cm and 2cm);
+    \node at (4.5, 4) {$L \in \mathcal{NP}$};
+    
+    % Sottoinsieme L1
+    \draw (3,2.2) ellipse (0.6cm and 1cm);
+    \node at (3, 2.2) {$L_1$};
+
+    % Area tratteggiata per L \ L1
+    \begin{scope}
+        \clip (3,2.2) ellipse (1.5cm and 2cm);
+        \draw[fill=white] (3,2.2) ellipse (0.6cm and 1cm);
+        \foreach \x in {0.5,0.8,...,5.5} {
+            \draw[gray, thin] (\x,0) -- ++(-2,5);
+        }
+    \end{scope}
+    % redraw inner ellipse to clear lines inside
+    \draw[fill=white] (3,2.2) ellipse (0.6cm and 1cm);
+    \node at (3, 2.2) {$L_1$};
+    
+    \node at (2, 3.5) {$L \setminus L_1$};
+\end{tikzpicture}
+\end{center}
