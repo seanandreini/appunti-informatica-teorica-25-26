@@ -1953,3 +1953,266 @@ Il seguente diagramma di Venn illustra visivamente i passaggi logici dell'Eserci
     \node at (2, 3.5) {$L \setminus L_1$};
 \end{tikzpicture}
 \end{center}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%06/05/2026
+\subsection{Test di Primalità}
+
+\textbf{Problema:} Determinare se $n$ è composto $\implies \exists d \mid n$, con $d \in [2, \sqrt{n}]$. 
+
+\vspace{0.4cm}
+\textbf{Dimostrazione:} Se $n$ è composto allora $n = m_1 \cdot m_2$. Per assurdo, se $m_1, m_2 > \sqrt{n}$ allora \\
+ $n = m_1 \cdot m_2 > n$ \textbf{(Assurdo)}
+
+\vspace{0.4cm}
+Questo suggerisce il seguente algoritmo:
+
+\textbf{Algoritmo:} Dato $n \in \mathbb{N}$, per ogni $d \in [2, \sqrt{n}]$ controllo se $d \mid n$:
+\begin{itemize}
+    \item se sì $\implies n$ è composto
+    \item se no $\implies n$ è primo
+\end{itemize}
+
+Per codificare l'input si usa la codifica binaria, dunque $\log n = l$ (lunghezza della codifica binaria di $n$), che diventa il parametro per calcolare la complessità.
+
+La complessità dell'algoritmo è particolarmente grande: (almeno) $\Omega(\sqrt{n}) = \Omega(2^{l/2}) \implies$ esponenziale rispetto a $l$.
+
+Vogliamo ridurne la complessità sfruttando proprietà note dei numeri primi:
+
+\vspace{0.4cm}
+\textbf{Piccolo Teorema di Fermat:}
+\begin{enumerate}
+    \item $p$ primo, $a \in \mathbb{N}$ allora $a^p \equiv a \pmod p$
+    \item $p$ primo, $a \in \mathbb{N}$ coprimo con $p$ (cioè $(a,p)=1$), allora $a^{p-1} \equiv 1 \pmod p$
+\end{enumerate}
+
+\vspace{0.4cm}
+\textbf{Algoritmo non deterministico:} \\
+Dato $n \in \mathbb{N}$ genero non deterministicamente $a \in \mathbb{N}$ tale che $(a,n)=1$:
+\begin{itemize}
+    \item se $a^{n-1} \equiv 1 \pmod n$ allora $n$ è primo
+    \item altrimenti $n$ è composto.
+\end{itemize}
+
+Questo algoritmo \textbf{non è corretto}, perché utilizza il teorema di Fermat al "contrario", ma non vale il viceversa del teorema.
+
+\vspace{0.4cm}
+\textbf{Esempio:} $p = 341$, $a = 2$, quindi $2^{340} \equiv 1 \pmod{341}$ ma $341 = 11 \cdot 31$ (non è primo!).
+
+Pur non essendo corretto ha una complessità migliore rispetto all'algoritmo precedente.
+Esiste infatti un algoritmo per il calcolo delle potenze modulari $a^n$ (che calcola potenza e successione del modulo) che ha complessità $\mathcal{O}(\log^2 n) = \mathcal{O}(l^2)$, ovvero \textbf{polinomiale}.
+Riusciamo a "sistemare" il seguente algoritmo, mantenendolo polinomiale? Sì, ed è stato dimostrato nel 1975 grazie a questo teorema:
+
+\vspace{0.4cm}
+\textbf{Teorema (Pratt):} Sia $n \in \mathbb{N}$. Se $\exists a \in \mathbb{N}$ tale che $(a,n)=1$, $a^{n-1} \equiv 1 \pmod n$, e $\forall q \mid n-1$ con $q$ primo si ha che $a^{\frac{n-1}{q}} \not\equiv 1 \pmod n$, allora $n$ è primo.
+
+L'algoritmo basato su questo teorema ha complessità polinomiale.
+
+\vspace{0.4cm}
+\textbf{Osservazione:} Ogni numero naturale possiede meno fattori primi distinti rispetto ai caratteri nella sua rappresentazione binaria.
+$$n = p_1^{\alpha_1} p_2^{\alpha_2} \dots p_r^{\alpha_r} \implies r \text{ fattori primi distinti}$$
+Il caso peggiore si ha con $\alpha_1 = \alpha_2 = \dots = \alpha_r = 1$, dunque $n = p_1 \cdot p_2 \dots p_r > 2^r$.
+
+Testare la condizione del piccolo teorema di Fermat per un certo numero di $a$ tuttavia non funziona a causa della presenza dei \textit{numeri di Carmichael}.
+
+\vspace{0.4cm}
+\textbf{Definizione:} Un numero $n \in \mathbb{N}$ si dice \textbf{numero di Carmichael} quando $\forall a \in \mathbb{N}$ con $(a,n)=1$ vale $a^{n-1} \equiv 1 \pmod n$, ma $n$ \textbf{non} è primo.
+
+\vspace{0.4cm}
+\textbf{Esempio:} $561$ è un numero di Carmichael, infatti la proprietà vale per ogni $a$ coprimo, ma $561 = 3 \cdot 11 \cdot 17$.
+
+\vspace{0.4cm}
+\textbf{Teorema (Alford, Granville, Pomerance):} Esistono infiniti numeri di Carmichael.
+
+\vspace{0.4cm}
+\textbf{Idea:} Si necessita quindi di una modifica al piccolo teorema di Fermat.
+
+\vspace{0.4cm}
+\textbf{Teorema (Agrawal):} Siano $n \ge 2 \in \mathbb{N}$ e $a \in \mathbb{N}$ con $(a,n)=1$. 
+$$ n \text{ è primo} \iff (x+a)^n \equiv x^n + a \pmod n $$
+
+\textbf{Dimostrazione:}
+$\implies$) Supponiamo $n$ primo: 
+Sappiamo che $(x+a)^n = \sum_{k=0}^{n} \binom{n}{k} a^{n-k} x^k$ dove $\binom{n}{k} = \frac{n!}{k!(n-k)!} = \frac{n \cdot (n-1) \dots (n-k+1)}{k!}$. 
+Se $0 < k < n$ allora $n \mid \binom{n}{k}$, dunque modulo $n$ tutti i termini si annullano e rimangono solo i coefficienti con $k=0$ e $k=n$. Dunque:
+$$(x+a)^n = \sum_{k=0}^{n} \binom{n}{k} a^{n-k} x^k \equiv x^n + a^n \equiv x^n + a \pmod n$$
+
+$\impliedby$) Supponiamo $n$ composto. Dimostriamo che $\exists k$ con $0 < k < n$ tale che $n \nmid \binom{n}{k}$. 
+Sfruttiamo il fatto che $n$ è composto. Sia $p \mid n$ un suo fattore primo. Supponiamo $p^\alpha \mid n$ e $p^{\alpha+1} \nmid n$. Se prendiamo il coefficiente binomiale $\binom{n}{p}$ allora $n \nmid \binom{n}{p}$ perché:
+$$\binom{n}{p} = \frac{n(n-1)\dots(n-p+1)}{p(p-1)\dots 2 \cdot 1}$$
+Osserviamo che $p^\alpha$ divide il numeratore; inoltre, nei fattori da $(n-1) \dots (n-p+1)$ non compare nessun'altra occorrenza del fattore $p$, dunque $p^{\alpha+1} \nmid$ numeratore.
+Nel denominatore abbiamo un'unica occorrenza di $p$, dunque $p^\alpha \nmid \binom{n}{p}$, ma sapendo che $p^\alpha \mid n$, ne consegue che $n \nmid \binom{n}{p}$.
+Questo significa che la congruenza non vale se $n$ è composto.
+
+\vspace{0.4cm}
+Il teorema di Fermat diventa così una condizione necessaria e sufficiente. Senza alcuna "precauzione", i coefficienti da testare sarebbero circa $n+1$, quindi dovremmo controllare $n=2^l$ congruenze.
+Vediamo se è possibile ridurre i coefficienti. 
+
+\textbf{Idea:} Dividere i polinomi nella congruenza per $x^r - 1$ per un opportuno parametro $r$.
+
+\vspace{0.4cm}
+\textbf{Algoritmo AKS:} Agrawal, Kayal, Saxena (2002) hanno dimostrato che se $n$ è composto e si sceglie un $r$ giusto, allora è sufficiente testare la seguente congruenza "per pochi" $a$: 
+$$ (x+a)^n \equiv x^n + a \pmod{n, x^r - 1} $$
+e se ne troverà sicuramente uno per cui non vale. Se invece tutte le congruenze valgono, allora il numero è primo.
+
+L'efficienza dipende dalla scelta dei parametri:
+\begin{itemize}
+    \item Necessario scegliere l'$r$ giusto $\to$ ha lunghezza polinomiale rispetto all'input.
+    \item Anche $a$ ha una lunghezza polinomiale rispetto all'input.
+\end{itemize}
+L'algoritmo AKS è dunque \textbf{polinomiale}, e a differenza di quelli probabilistici, è anche \textbf{corretto e deterministico}.
+
+\vspace{0.8cm}
+
+\subsection{Esercizio: Macchina di Turing e Transizioni}
+
+\begin{center}
+\begin{tikzpicture}[>=stealth,
+    state/.style={circle, draw, minimum size=0.8cm, inner sep=1pt, thick},
+    trans/.style={font=\small}, 
+    magenta_text/.style={text=magenta, font=\footnotesize, align=center}
+]
+
+    % --- NODI (Posizionati su coordinate assolute per evitare deformazioni) ---
+    
+    % Prima Riga
+    \node[state] (q0) at (0, 0) {$q_0$};
+    \node[state] (q1) at (2.5, 0) {$q_1$};
+    \node[state] (q2) at (5.0, 0) {$q_2$};
+    \node[state] (q3) at (7.5, 0) {$q_3$};
+    \node[state] (q4) at (10.0, 0) {$q_4$};
+
+    % Seconda Riga
+    \node[state] (q5) at (2.5, -3.5) {$q_5$};
+    \node[state] (q6) at (5.0, -3.5) {$q_6$};
+    \node[state] (q7) at (7.5, -3.5) {$q_7$};
+    \node[state] (q8) at (10.0, -3.5) {$q_8$};
+
+    % Terza Riga
+    \node[state] (q9) at (8.5, -7.5) {$q_9$};
+    \node[state] (qf) at (11.5, -7.5) {$q_f$};
+
+    % --- ARCHI E TRANSIZIONI ---
+    
+    % Orizzontali - Riga 1
+    \draw[->, thick] (q0) -- node[above, trans] {$* \mid \#$} (q1);
+    \draw[->, thick] (q1) -- node[above, trans] {$\# \mid D$} (q2);
+    \draw[->, thick] (q2) -- node[above, trans] {$1 \mid D$} (q3);
+    \draw[->, thick] (q3) -- node[above, trans] {$\# \mid S$} (q4);
+
+    % Loop - Riga 1
+    \draw[->, thick] (q2) to[loop above] node[above, trans, align=center] {$0 \mid D$} (q2);
+    \draw[->, thick] (q3) to[loop above] node[above, trans, align=center] {$* \mid \#$ \\ $1 \mid D$} (q3);
+    \draw[->, thick] (q4) to[loop above] node[above, trans, align=center] {$1 \mid S$ \\ $0 \mid S$} (q4);
+
+    % Ritorno lungo da q4 a q5 (Ortogonale, non incrocia nulla)
+    \draw[->, thick, rounded corners=12pt] (q4.south) -- (10.0, -1.8) -- node[above, trans] {$\# \mid D$} (2.5, -1.8) -- (q5.north);
+
+    % Orizzontali - Riga 2
+    \draw[->, thick] (q5) -- node[above, trans] {$0 \mid *$} (q6);
+    \draw[->, thick] (q6) -- node[above, trans] {$1 \mid *$} (q7);
+    \draw[->, thick] (q7) -- node[above, trans] {$0 \mid S$} (q8);
+
+    % Loop - Riga 2
+    \draw[->, thick] (q6) to[loop above] node[above, trans, align=center] {$* \mid D$ \\ $0 \mid D$} (q6);
+    \draw[->, thick] (q7) to[loop above] node[above, trans, align=center] {$* \mid S$} (q7);
+    \draw[->, thick] (q8) to[loop above] node[above, trans, align=center] {$0 \mid S$ \\ $* \mid S$} (q8);
+
+    % Ritorno da q8 a q5 (Ortogonale sotto i nodi)
+    \draw[->, thick, rounded corners=12pt] (q8.south) -- (10.0, -5.8) -- node[below, trans] {$* \mid D$} (2.5, -5.8) -- (q5.south);
+
+    % Da Riga 2 a Riga 3 (pos=0.2 sposta l'etichetta in alto, lontana dalla linea di ritorno!)
+    \draw[->, thick] (q7.south) to[out=270, in=150] node[pos=0.2, right, trans, xshift=0.1cm] {$\# \mid D$} (q9.north west);
+
+    % Orizzontali e Loop - Riga 3
+    \draw[->, thick] (q9) to[loop above] node[above, trans] {$* \mid D$} (q9);
+    \draw[->, thick] (q9) -- node[above, trans] {$\# \mid \#$} (qf);
+
+
+    % --- ANNOTAZIONI MAGENTA ---
+    
+    % Parentesi superiori (alzate a y=1.8 e y=2.2 per non toccare i loop)
+    \node[magenta_text] at (5.0, 1.8) {$\overbrace{\hspace{1.2cm}}$ \\[-1ex] alcuni 0};
+    \node[magenta_text] at (7.5, 2.2) {$\overbrace{\hspace{1.5cm}}$ \\[-1ex] alcuni 1, no 0};
+
+    % Lato destro in alto
+    \node[magenta_text, right, align=left] at (10.6, 0) {$\left.\rule{0pt}{0.8cm}\right\}$ scorre stringa fino all'inizio};
+
+    % Lato sinistro al centro
+    \node[magenta_text, left, align=right] at (1.6, -3.5) {inizia \\ un nuovo \\ controllo};
+
+    % Centrali inferiori (perfettamente nello spazio vuoto)
+    \node[magenta_text] at (5.0, -4.8) {finché trovo 0 \\ vado a dx};
+    
+    % Graffa a destra per q8
+    \node[magenta_text, right, align=left] at (10.6, -3.5) {$\left.\rule{0pt}{1.0cm}\right\}$ finché trovo 0 vado a sx \\ $\to$ ciclo in cui sostituisco \\ $*$ a 1 e 0};
+
+    % Fondo
+    \node[magenta_text] at (10.0, -6.6) {non devono essere \\ 1 residui};
+    \node[magenta_text] at (10.0, -8.7) {arrivo qui quando a sx incontro solo $*$ \\ $\implies$ numero 0 = numero 1};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{1) Linguaggio accettato:}
+La macchina si aspetta stringhe del formato $\# 0 0 0 1 1 1 \# \dots$
+Cioè stringhe del tipo $0^h 1^k$ con $h \ge 1, k \ge 1$. Per come cicla eliminando in coppia 0 e 1, accetta la stringa solo se in realtà $h=k$. Dunque il linguaggio accettato è:
+$$ L = \{ 0^h 1^h \mid h > 0 \} $$
+
+\vspace{0.4cm}
+\textbf{2) Studio del caso peggiore:}
+Fissata una lunghezza della stringa pari a $n$, com'è fatta la stringa in cui la macchina esegue il numero massimo di transizioni?
+$\implies$ Il caso peggiore si ha con una stringa \textbf{non accettata} ma che forza l'algoritmo a fare più passaggi possibili.
+\begin{itemize}
+    \item Se $n$ è \textbf{pari}: $0^{n/2} 1^{n/2}$ (devo fare tutte le trasformazioni prima di finire)
+    \item Se $n$ è \textbf{dispari}: $0^{(n+1)/2} 1^{(n-1)/2}$
+\end{itemize}
+
+\textbf{Esempio Pratico:} Tra $001$ e $011$, in quale viene eseguito il numero massimo di passi?
+\begin{itemize}
+    \item per la stringa $001$: 10 transizioni
+    \item per la stringa $011$: 8 transizioni
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{3) Calcolo della Complessità in Tempo:}
+Il tempo calcolato $t_{TM}(n)$ dipenderà dal conteggio delle transizioni fatte avanti e indietro per fare "matching" tra zeri e uno.
+$$ t_{TM}(n) = 1 + 1 + \frac{n}{2} + \frac{n}{2} + 1 + 1 + n + 1 + \dots $$
+$\implies$ Per il calcolo esatto è necessario distinguere il caso in cui $n$ sia pari dal caso in cui $n$ sia dispari.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%07/05/2026
+
+
+
+%13/05/2026
