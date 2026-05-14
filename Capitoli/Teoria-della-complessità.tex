@@ -2208,10 +2208,247 @@ $\implies$ Per il calcolo esatto è necessario distinguere il caso in cui $n$ si
 
 
 
-
-
-
 %07/05/2026
+\subsection{La classe di linguaggi esponenziali}
+
+\textbf{Definizione:} 
+$$ \text{Exp} = \{ L \text{ linguaggio} \mid \exists M \text{ MDT deterministica che accetta } L \text{ t.c. } t_{c_M}(n) = \mathcal{O}(2^{n^k}), \exists k \ge 1 \} $$
+
+\textbf{Osservazione:} $L \in \text{Exp} \iff \exists M \text{ MDT deterministica che accetta } L \text{ t.c. } t_{c_M}(n) = \mathcal{O}(c^{p(n)})$, con $\exists c > 1$ e $\exists p$ polinomio.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\mathcal{P} \subseteq \text{Exp}$
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\mathcal{NP} \subseteq \text{Exp}$
+
+\textit{Dimostrazione:} Si basa sulla costruzione di una MDT deterministica equivalente a una non deterministica.
+Sia $L \in \mathcal{NP} \implies \exists M \text{ MDT non deterministica polinomiale che accetta } L$, con $t_{c_M}(n) = p(n)$.
+La complessità di una MDT deterministica equivalente a $M$ è data da:
+$$ \underbrace{\delta^{p(n)}}_{\substack{\text{grado di non} \\ \text{det. di } M}} \cdot p(n) \implies L \in \text{Exp} $$
+
+\begin{center}
+    \fbox{$\mathcal{P} \subseteq \mathcal{NP} \subseteq \text{Exp} \quad \longleftarrow \quad$ Stabilire se le inclusioni siano strette ($\stackrel{?}{=}$) è ancora un \textbf{problema aperto}.}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\mathcal{P} \subset \text{Exp}$ (Inclusione stretta)
+
+\textit{Dimostrazione:} Facciamo vedere che $\exists L \in \text{Exp}$ tale che $L \notin \mathcal{P}$. 
+
+Sia $L = \{ R(M)x \mid M \text{ su } x \text{ termina in uno stato finale entro } 2^{|x|} \text{ transizioni} \}$.
+
+\textbf{1) Dimostriamo che $L \in \text{Exp}$.} 
+Costruiamo una MDT $N$ che su input $R(M)x$:
+\begin{itemize}
+    \item esegue $M$ su $x$
+    \item se $M$ termina in uno stato finale entro $2^{|x|}$ transizioni, \textit{accetta}
+    \item altrimenti \textit{rifiuta}
+\end{itemize}
+Evidentemente $N$ accetta $L$.
+Calcoliamo la complessità in tempo di $N$: sia $|R(M)x| = n$. Per avere il caso peggiore, considero la codifica $|R(M)|$ corta rispetto a $|x|$, in modo tale che $|R(M)x| \sim |x| \implies t_{c_M} = \mathcal{O}(2^n) \implies L \in \text{Exp}$.
+\textit{Osservazione:} $2^{2n} \notin \mathcal{O}(2^n)$, poiché $\frac{2^{2n}}{2^n} = 2^n \xrightarrow{n \to +\infty} +\infty$.
+
+\textbf{2) Dimostriamo che $L \notin \mathcal{P}$.} 
+Facciamo vedere che $\nexists N$ MDT deterministica che accetta $L$ t.c. $t_{c_N}(n) = \mathcal{O}(2^n)$.
+\begin{itemize}
+    \item \textit{Per Assurdo:} sia $N$ una MDT deterministica che accetta $L$ per stati finali t.c. $t_{c_N}(n) = 2^n$.
+    \item Sia $D$ una MDT definita come segue. Su input $R(M)$:
+    \begin{itemize}
+        \item esegue $N$ su $R(M)R(M)$
+        \item se $N$ termina in uno stato finale, $D$ termina in uno stato non finale
+        \item se $N$ termina in uno stato non finale, $D$ termina in uno stato finale
+    \end{itemize}
+    \item Complessità in tempo di $D$: posto $|R(M)| = n$, abbiamo $t_{c_D}(n) = t_{c_N}(2n) = 2^{2n}$.
+\end{itemize}
+Eseguiamo $D$ su $R(D)$:
+\begin{enumerate}
+    \item $D$ su $R(D)$ termina in uno stato finale $\xrightarrow{\text{per det. di } D} N$ su $R(D)R(D)$ termina in uno stato non finale $\implies N$ non accetta $L$ (\textbf{Assurdo}).\\
+    $D$ su $R(D)$ non termina in uno stato finale $\impliedby D$ su $R(D)$ non termina in uno stato finale entro $2^{|R(D)|}$ transizioni.
+    
+    \item $D$ su $R(D)$ termina in uno stato non finale $\xrightarrow{\text{per det. di } D} N$ su $R(D)R(D)$ termina in uno stato finale $\implies N$ non accetta $L$ (\textbf{Assurdo}).\\
+    $D$ su $R(D)$ termina in uno stato finale entro $2^{|R(D)|}$ transizioni.
+\end{enumerate}
+
+\vspace{0.6cm}
+\textbf{Definizione:} 
+$$ \text{NExp} = \{ L \text{ linguaggio} \mid \exists M \text{ MDT non det. che accetta } L \text{ t.c. } t_{c_M}(n) = \mathcal{O}(2^{n^k}), \exists k \ge 1 \} $$
+
+\textit{Osservazione:} $\text{Exp} \subseteq \text{NExp}$. Verificare se $\text{Exp} = \text{NExp}$ è un \textbf{problema aperto}.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\text{Exp} \neq \text{NExp} \implies \mathcal{P} \neq \mathcal{NP}$
+
+\textit{Dimostrazione:} Facciamo vedere l'implicazione contronominale $\mathcal{P} = \mathcal{NP} \implies \text{Exp} = \text{NExp}$. Siccome $\text{Exp} \subseteq \text{NExp}$ per definizione, faremo vedere che $\text{NExp} \subseteq \text{Exp}$.
+Sia $L \in \text{NExp}$, e sia $M$ una MDT non deterministica che accetta $L$ t.c. $t_{c_M}(n) = \mathcal{O}(2^{n^k})$.
+Definiamo un nuovo linguaggio $\tilde{L} = \{ x 1^{2^{|x|^k}} \mid x \in L \}$ (con il carattere $1 \notin$ alfabeto di $L$).
+
+Facciamo vedere che $\tilde{L} \in \mathcal{NP}$. Esiste una MDT non deterministica $N$ che accetta $\tilde{L}$ operando in questo modo su input $y$:
+\begin{itemize}
+    \item controllo se $\exists z$ t.c. $y = z 1^{2^{|z|^k}}$ (se non è così, rifiuto)
+    \item controllo se $z \in L$ (usando la macchina $M$)
+\end{itemize}
+Il tempo $t_{c_N}(n)$ è un polinomio in $n$.
+Poiché $\mathcal{P} = \mathcal{NP}$ (per ipotesi iniziale), si ha $\tilde{L} \in \mathcal{P}$, dunque $\exists R$ MDT deterministica polinomiale che accetta $\tilde{L}$.
+Possiamo quindi costruire una MDT \textbf{deterministica} per decidere $L$. Su input $x$:
+\begin{itemize}
+    \item costruisco $y = x 1^{2^{|x|^k}}$
+    \item uso $R$ per stabilire se $y \in \tilde{L}$
+\end{itemize}
+La complessità in tempo di questa operazione è esponenziale rispetto a $n$. Abbiamo quindi dimostrato l'inclusione $\implies \text{NExp} \subseteq \text{Exp}$.
+
+\vspace{0.8cm}
+
+\subsection{Complessità Spaziale}
+
+\textbf{Definizione:} Sia $M$ una MDT a $K$ nastri ($K \ge 2$), con nastro di input di sola lettura. Definiamo la complessità spaziale $s_{c_M}: \mathbb{N} \to \mathbb{N}$ come:
+$$s_{c_M}(n) = \text{numero di celle sui nastri di lavoro a cui le testine hanno accesso} $$
+$$ \text{durante una computazione di } M \text{ su una stringa di lunghezza } n \text{ nel caso peggiore.} $$
+
+\newpage{}
+\textbf{Osservazioni:}
+\begin{enumerate}
+    \item La definizione va bene sia nel caso deterministico che non deterministico.
+    \item Non è necessario che la MDT termini su ogni input.
+    \item $s_{c_M}(n) > 0$.
+\end{enumerate}
+
+\vspace{0.4cm}
+\textbf{Esempio:} Sia $L$ il linguaggio delle palindrome binarie sull'alfabeto $\{a, b\}$.
+Progettiamo una MDT per decidere $L$. 
+All'inizio scrivo $1$ sul nastro 3 e il nastro 2 è vuoto; sul nastro 1 c'è l'input e le testine sono all'inizio del nastro.
+
+\begin{center}
+\begin{tikzpicture}[>=stealth]
+    % Nastro 3
+    \node at (-1.5, 1) {\footnotesize \textbf{3}};
+    \draw[thick] (0, 0.8) rectangle (0.6, 1.2) node[pos=0.5] {\#};
+    \draw[thick] (0.6, 0.8) rectangle (1.2, 1.2) node[pos=0.5] {i};
+    \draw[thick] (1.2, 0.8) -- (2.5, 0.8);
+    \draw[thick] (1.2, 1.2) -- (2.5, 1.2);
+    
+    % Nastro 2
+    \node at (-1.5, 0) {\footnotesize \textbf{2}};
+    \draw[thick] (0, -0.2) rectangle (0.6, 0.2) node[pos=0.5] {\#};
+    \draw[thick] (0.6, -0.2) rectangle (1.2, 0.2) node[pos=0.5] {i};
+    \draw[thick] (1.2, -0.2) -- (2.5, -0.2);
+    \draw[thick] (1.2, 0.2) -- (2.5, 0.2);
+    
+    % Nastro 1
+    \node at (-1.5, -1) {\footnotesize \textbf{1}};
+    \draw[thick] (0, -1.2) rectangle (0.6, -0.8) node[pos=0.5] {\#};
+    \draw[thick] (0.6, -1.2) rectangle (1.2, -0.8) node[pos=0.5] {a};
+    \draw[thick] (1.2, -1.2) rectangle (1.8, -0.8) node[pos=0.5] {b};
+    \draw[thick] (1.8, -1.2) rectangle (2.4, -0.8) node[pos=0.5] {b};
+    \draw[thick] (2.4, -1.2) rectangle (3.0, -0.8) node[pos=0.5] {a};
+    \draw[thick] (3.0, -1.2) rectangle (3.6, -0.8) node[pos=0.5] {b};
+    \draw[thick] (3.6, -1.2) rectangle (4.2, -0.8) node[pos=0.5] {b};
+    \draw[thick] (4.2, -1.2) rectangle (4.8, -0.8) node[pos=0.5] {a};
+    \draw[thick] (4.8, -1.2) -- (5.5, -1.2);
+    \draw[thick] (4.8, -0.8) -- (5.5, -0.8);
+    
+    % Puntatore Testina Nastro 1
+    \draw[->, thick] (0.3, -1.7) -- (0.3, -1.3);
+\end{tikzpicture}
+\end{center}
+
+\textbf{Algoritmo della MDT:} \\
+Quando sul nastro 3 c'è scritto $i$:
+\begin{itemize}
+    \item[$\circledast$] $\left[ \begin{tabular}{@{}l@{}}
+        $\bullet$ copio $i$ sul nastro 2 \\
+        $\bullet$ Finché non arrivo a $0$ sul nastro 2: \\
+        \hspace{0.5cm} - sposto le testine a dx sul nastro 1 \\
+        \hspace{0.5cm} - decremento il contatore sul nastro 2
+    \end{tabular} \right.$
+    \item se sul nastro 1 trovo $*$ accetto
+    \item altrimenti, leggo il carattere sul nastro 1 (lo chiamo $w_i$) e lo "memorizzo"
+    \item sposto la testina del nastro 1 sulla prima cella $*$ a dx dell'input
+    \item mi comporto come nel punto $\circledast$, ma sostituendo \textit{dx} con \textit{sx}
+    \item confronto $w_i$ con $w_{n+1-i}$ : se sono diversi, rifiuto; altrimenti aggiorno \\
+    il nastro 3 scrivendo $i+1$ e ricomincio il ciclo.
+\end{itemize}
+
+\textbf{Complessità in spazio:}
+Nel caso peggiore (che si verifica in caso di accettazione totale), se scriviamo i numeri naturali in binario avremo:
+$$ s_{c_M}(n) = 2 \cdot (\lceil \log n \rceil) $$
+(poiché devo scrivere il valore $n+1$ sui nastri 2 e 3).
+
+\vspace{0.4cm}
+\textbf{Proposizione:} Se $M$ è una MDT a 2 nastri t.c. $t_{c_M}(n) = f(n) \implies s_{c_M}(n) \le f(n) + 1$.
+
+\textit{Dimostrazione:} Nel caso peggiore, $M$ legge una nuova cella sul nastro di lavoro ad ogni transizione. Aggiungendo la cella iniziale di partenza, otteniamo proprio $s_{c_M}(n) \le f(n) + 1$.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} Se $M$ è una MDT a 2 nastri t.c. $s_{c_M}(n) = f(n) \implies t_{c_M}(n) \le m \cdot (n+2) \cdot f(n) \cdot t^{f(n)}$.
+
+\textit{Dimostrazione:} Poiché $M$ deve terminare su ogni input, essa non può transitare 2 volte per la stessa configurazione. Valutiamo il numero totale di possibili configurazioni di $M$ su una stringa in input di lunghezza $n$. 
+
+Siano:
+\begin{itemize}
+    \item $|Q| = m$ il numero di possibili stati della macchina;
+    \item $|\Sigma| = t$ la dimensione dell'alfabeto di lavoro.
+\end{itemize}
+
+Analizziamo i nastri:
+\begin{center}
+\begin{tikzpicture}[>=stealth]
+    % Nastro 2
+    \node at (-0.5, 0.5) {\textbf{2}};
+    \draw[thick] (0, 0.3) rectangle (3.0, 0.7);
+    \draw[snake=coil, segment length=4pt] (0.2, 0.5) -- (2.8, 0.5);
+    \draw [decorate,decoration={brace,amplitude=5pt,raise=1ex}] (0, 0.7) -- (3.0, 0.7) node[midway,yshift=2em] {\footnotesize $f(n)$};
+    \draw[->, thick] (1.5, -0.2) -- (1.5, 0.2);
+    
+    % Nastro 1
+    \node at (-0.5, -1) {\textbf{1}};
+    \draw[thick] (0, -1.2) rectangle (0.6, -0.8) node[pos=0.5] {\#};
+    \draw[thick] (0.6, -1.2) rectangle (1.2, -0.8) node[pos=0.5] {$w_1$};
+    \draw[thick] (1.2, -1.2) rectangle (1.8, -0.8) node[pos=0.5] {$w_2$};
+    \draw[thick] (1.8, -1.2) rectangle (2.8, -0.8) node[pos=0.5] {$\dots$};
+    \draw[thick] (2.8, -1.2) rectangle (3.4, -0.8) node[pos=0.5] {$w_n$};
+    \draw[thick] (3.4, -1.2) rectangle (4.0, -0.8) node[pos=0.5] {\#};
+    \draw[thick] (4.0, -1.2) rectangle (4.6, -0.8) node[pos=0.5] {$\rightarrow$};
+    \draw[thick] (4.6, -1.2) -- (5.0, -1.2);
+    \draw[thick] (4.6, -0.8) -- (5.0, -0.8);
+    \draw[->, thick] (0.3, -1.7) -- (0.3, -1.3);
+\end{tikzpicture}
+\end{center}
+
+Il limite massimo di passi è dato dal prodotto di tutte le variabili che definiscono una singola configurazione della macchina:
+$$ t_{c_M}(n) \le \underbrace{m}_{\text{numero di stati}} \cdot \underbrace{(n+2)}_{\substack{\text{posizioni testina} \\ \text{nastro 1}}} \cdot \underbrace{f(n)}_{\substack{\text{posizioni testina} \\ \text{nastro 2}}} \cdot \underbrace{t^{f(n)}}_{\text{contenuto nastro 2}} $$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%11/05/2026
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
