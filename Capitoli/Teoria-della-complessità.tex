@@ -2435,9 +2435,172 @@ $$ t_{c_M}(n) \le \underbrace{m}_{\text{numero di stati}} \cdot \underbrace{(n+2
 
 
 
-
 %11/05/2026
+\subsection{Le Classi PSpace e NPSpace}
 
+\textbf{Definizione:} 
+$$ \text{PSpace} = \{ L \text{ linguaggio} \mid \exists M \text{ MDT deterministica che decide } L \text{ t.c. } s_{c_M}(n) = \mathcal{O}(n^k), \exists k \ge 1 \} $$
+
+\textbf{Osservazioni:}
+\begin{enumerate}
+    \item $\mathcal{P} \subseteq \text{PSpace}$ (dalla proposizione 1). Ci si chiede se $\mathcal{P} \stackrel{?}{=} \text{PSpace}$.
+    \item $\text{PSpace} \subseteq \text{Exp}$ (dalla proposizione 2). Ci si chiede se $\text{PSpace} \stackrel{?}{=} \text{Exp}$.
+    \item $\mathcal{NP} \subseteq \text{PSpace}$. Infatti, se $L \in \mathcal{NP} \implies \exists M \text{ MDT non deterministica polinomiale in tempo che accetta } L$.
+\end{enumerate}
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, thick]
+    
+    % --- Nastri / Memoria (Aperti sulla destra) ---
+    % Nastro 1: computazioni
+    \draw (3.5, 1.8) -- (0, 1.8) -- (0, 1.3) -- (3.5, 1.3);
+    \node at (1.75, 1.55) {\textbf{computazioni}};
+    \node[right] at (3.6, 1.55) {$\mathcal{O}(p(n))$};
+
+    % Nastro 2: simulazione
+    \draw (3.5, 0.9) -- (0, 0.9) -- (0, 0.4) -- (3.5, 0.4);
+    \node at (1.75, 0.65) {\textbf{simulazione}};
+    \node[right] at (3.6, 0.65) {$\mathcal{O}(p(n))$};
+
+    % Nastro 3: INPUT
+    \draw (3.5, -0.2) -- (0, -0.2) -- (0, -0.7) -- (3.5, -0.7);
+    \node at (1.75, -0.45) {\textbf{INPUT}};
+
+    % --- Graffa e Spazio ---
+    \draw[decorate, decoration={brace, amplitude=6pt, mirror}] (5.0, 0.4) -- (5.0, 1.8) node[midway, right=8pt] {\textbf{spazio}};
+
+    % --- Testo in alto a destra ---
+    \node[align=left, right] at (6.5, 1.8) {\large Posso riutilizzare lo spazio};
+
+    % --- Diagramma di Venn ---
+    \begin{scope}[shift={(10.5, -0.2)}]
+        % PSpace (Cerchio esterno)
+        \draw[ultra thick] (0, 0) circle (1.6);
+        \node[above right] at (0.8, 1.0) {\large \textbf{PSpace}};
+
+        % NP (Cerchio interno a sinistra)
+        \draw[thick] (-0.5, 0) circle (0.9);
+        \node at (-0.6, 0.6) {\textbf{NP}};
+
+        % coNP (Ovale che interseca NP)
+        \draw[thick] (0.5, 0) ellipse (0.4 and 0.8);
+        \node at (0.6, 1.0) {\textbf{coNP}};
+
+        % P (Cerchio piccolo dentro NP)
+        \draw[thick] (-0.5, -0.3) circle (0.3);
+        \node at (-0.5, -0.3) {\textbf{P}};
+    \end{scope}
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{Definizione:} 
+$$ \text{NPSpace} = \{ L \text{ linguaggio} \mid \exists M \text{ MDT non deterministica che accetta } L \text{ t.c. } s_{c_M}(n) = \mathcal{O}(n^k), \exists k \ge 1 \} $$
+
+\vspace{0.4cm}
+\textbf{Teorema di Savitch:} $\text{PSpace} = \text{NPSpace}$
+
+\textit{Dimostrazione:}
+L'inclusione $\text{PSpace} \subseteq \text{NPSpace}$ è ovvia. Vogliamo mostrare che $\text{NPSpace} \subseteq \text{PSpace}$. 
+Sia $L \in \text{NPSpace}$ e sia $M$ una MDT non deterministica che accetta $L$ in spazio polinomiale.
+
+Il numero di possibili configurazioni di $M$ in una sua computazione su un input di lunghezza $n$ è:
+$$ = \mathcal{O}\left(2^{c \cdot s_{c_M}(n)}\right) \quad \text{(per un opportuno } c \text{)} $$
+
+Sia $x$ una stringa di lunghezza $n$. Una computazione accettante di $M$ su $x$ procede in questo modo:
+\begin{center}
+\begin{tikzpicture}[>=stealth]
+    \node (C) at (0,0) {$C_x$};
+    \node[below, align=center] at (C.south) {\footnotesize configurazione \\ \footnotesize iniziale};
+
+    \node (Cstar) at (4,0) {$C^*$};
+    \node[below, align=center] at (Cstar.south) {\footnotesize configurazione \\ \footnotesize accettante \\ \footnotesize (supponiamo che sia unica)};
+
+    \draw[->, thick, snake=coil, segment aspect=0, segment length=10pt, segment amplitude=1.5pt] (C) -- (Cstar);
+\end{tikzpicture}
+\end{center}
+
+Definiamo la funzione booleana $\text{Reachable}(C, C', j)$, la quale è \textbf{vera} quando, partendo dalla configurazione $C$, posso raggiungere $C'$ in al più $2^j$ transizioni. 
+(Con $C, C'$ configurazioni di $M$ e $j \in \mathbb{N}$).
+
+\textbf{Osservazione:} $x \in L \iff x$ è accettata da $M \iff \text{Reachable}(C_x, C^*, c \cdot s_{c_M}(n))$ è vero.
+
+Scriviamo un algoritmo (deterministico!) per valutare $\text{Reachable}(C, C', j)$:
+\begin{itemize}
+    \item se $j = 0$, è facile.
+    \item altrimenti: $\forall \tilde{C}$ configurazione, valuto le chiamate ricorsive:
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, thick]
+
+    % --- Parte Superiore: Chiamate Ricorsive ---
+    \node[align=left] (R1) at (0, 0.6) {$\text{Reachable}(C, \tilde{C}, j-1)$};
+    \node[align=left] (R2) at (0, -0.6) {$\text{Reachable}(\tilde{C}, C', j-1)$};
+    
+    \draw[decorate, decoration={brace, amplitude=5pt}, thick] (2.2, 0.9) -- (2.2, -0.9);
+
+    \node[align=left, right] at (2.5, 0) {
+        $\exists \tilde{C}$ per cui entrambi veri $\implies$ \textbf{vero} \\ 
+        altrimenti $\implies$ \textbf{falso}
+    };
+
+    % --- Parte Inferiore: Rappresentazione del path ---
+    % Spostata in basso (y = -3) e allineata centralmente
+    \begin{scope}[shift={(3, -3)}]
+        \node (C) at (0, 0.6) {$C_x$};
+        \node (Ctilde) at (1.5, 0.6) {$\tilde{C}$};
+        \node (Cprime) at (3.0, 0.6) {$C'$};
+
+        % Frecce ondulate (con pre e post length per non deformare la punta)
+        \draw[->, decorate, decoration={snake, amplitude=1.2pt, segment length=5pt, pre length=2pt, post length=3pt}] (C) -- (Ctilde);
+        \draw[->, decorate, decoration={snake, amplitude=1.2pt, segment length=5pt, pre length=2pt, post length=3pt}] (Ctilde) -- (Cprime);
+
+        % Graffe inferiori per il numero di transizioni
+        \draw[decorate, decoration={brace, amplitude=3pt, mirror}] (0.1, 0.3) -- (3, 0.3) node[midway, below] {\footnotesize al più $2^j$ transizioni};
+        
+    \end{scope}
+
+\end{tikzpicture}
+\end{center}
+
+\textbf{Complessità in spazio}
+
+Sia $f(j)$ lo spazio richiesto per calcolare $\text{Reachable}$ quando il terzo parametro è $j$:
+\begin{align*}
+    f(j) &= f(j-1) + \mathcal{O}(s_{c_M}(n)) \\
+    &= f(j-2) + 2 \cdot \mathcal{O}(s_{c_M}(n)) \\
+    &= f(j-k) + k \cdot \mathcal{O}(s_{c_M}(n)) \\
+    &= j \cdot \mathcal{O}(s_{c_M}(n)) = \mathcal{O}(j \cdot s_{c_M}(n))
+\end{align*}
+
+Sostituendo il parametro iniziale nel caso peggiore $j = c \cdot s_{c_M}(n)$, si ottiene:
+$$ f(c \cdot s_{c_M}(n)) = \mathcal{O}(c \cdot s_{c_M}(n)^2) = \mathcal{O}(s_{c_M}(n)^2) $$
+
+\vspace{0.4cm}
+\textbf{Definizione:} Un linguaggio $L$ si dice \textbf{PSpace-difficile} quando $\forall Q \in \text{PSpace}$, $\exists f$ riduzione polinomiale in tempo da $Q$ a $L$.
+
+\textbf{Definizione:} Un linguaggio $L$ si dice \textbf{PSpace-completo} quando $L$ è PSpace-difficile e $L \in \text{PSpace}$.
+
+\vspace{0.4cm}
+\textbf{Proposizione:} 
+\begin{enumerate}
+    \item $L$ è PSpace-completo e $L \in \mathcal{P} \implies \mathcal{P} = \text{PSpace}$
+    \item $L$ è PSpace-completo e $L \in \mathcal{NP} \implies \mathcal{NP} = \text{PSpace}$
+\end{enumerate}
+
+\textit{Dimostrazione (del punto 1):}
+L'inclusione $\mathcal{P} \subseteq \text{PSpace}$ è ovvia. 
+Sia $Q \in \text{PSpace}$; poiché $L$ è PSpace-completo, $\exists f$ riduzione polinomiale in tempo da $Q$ a $L$.
+
+\textbf{Algoritmo per decidere $Q$:} \\
+Data la stringa $w$:
+\begin{itemize}
+    \item calcolo $f(w) \leadsto$ in \textit{tempo polinomiale}
+    \item decido se $f(w) \in L \leadsto$ in \textit{tempo polinomiale} (perché sappiamo per ipotesi che $L \in \mathcal{P}$)
+\end{itemize}
+Dato che l'intera decisione avviene in somma polinomiale $\implies Q \in \mathcal{P}$.
 
 
 
