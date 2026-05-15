@@ -2436,6 +2436,7 @@ $$ t_{c_M}(n) \le \underbrace{m}_{\text{numero di stati}} \cdot \underbrace{(n+2
 
 
 %11/05/2026
+\vspace{0.8cm}
 \subsection{Le Classi PSpace e NPSpace}
 
 \textbf{Definizione:} 
@@ -2615,4 +2616,208 @@ Dato che l'intera decisione avviene in somma polinomiale $\implies Q \in \mathca
 
 
 
+
+
 %13/05/2026
+\newpage{}
+\subsection{Problemi di conteggio}
+
+Sia $\Sigma = \{0, 1\}$ e $f: \Sigma^* \to \mathbb{N}$
+
+\textbf{Definizione:} 
+$$ \text{FP} = \{ f: \Sigma^* \to \mathbb{N} \mid \exists M \text{ MDT che calcola } f \text{ t.c. } t_{c_M}(n) = \mathcal{O}(n^k), \exists k \ge 1 \} $$
+
+\textbf{Definizione:} 
+$$
+\text{\#P} = \left\{ f: \Sigma^* \to \mathbb{N} \;\middle|\; 
+\begin{aligned}
+    & \exists M \text{ MDT non deterministica polinomiale t.c. } \\
+    & \forall w \in \Sigma^*, f(w) \text{ è il numero di computazioni accettanti di } M \text{ su } w
+\end{aligned}
+\right\}
+$$
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\text{FP} \subseteq \text{\#P}$
+
+\textit{Dimostrazione:} Sia $f \in \text{FP}$, e sia $M$ una MDT deterministica polinomiale che calcola $f$. \\
+Considero la seguente MDT non deterministica polinomiale: \\
+su input $w$:
+\begin{itemize}
+    \item calcolo $f(w) = k$;
+    \item genero $k$ computazioni (ciascuna delle quali stampa un intero $i$, con $1 \le i \le k$) e le considero tutte accettanti.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, thick]
+    % Nodi iniziali
+    \node (w) at (0,0) {$w$};
+    \node (f) at (1.8,0) {$f(w)=k$};
+    
+    % Nodi della colonna di destra
+    \node (n1) at (3.5, 0.7) {$1$};
+    \node (ndots) at (3.5, 0.1) {$\vdots$};
+    \node (nk) at (3.5, -0.6) {$k$};
+    
+    % Freccia ondulata principale
+    \draw[->, decorate, decoration={snake, amplitude=1.2pt, segment length=6pt, pre length=2pt, post length=3pt}] (w) -- (f);
+    
+    % Diramazioni ondulate a forcella
+    \draw[decorate, decoration={snake, amplitude=1.2pt, segment length=5pt, post length=1pt}] (f.east) to[out=30, in=180] (n1.west);
+    \draw[decorate, decoration={snake, amplitude=1.2pt, segment length=5pt, post length=1pt}] (f.east) to[out=0, in=180] (ndots.west);
+    \draw[decorate, decoration={snake, amplitude=1.2pt, segment length=5pt, post length=1pt}] (f.east) to[out=-30, in=180] (nk.west);
+    
+    % Graffa
+    \draw[decorate, decoration={brace, amplitude=6pt}] (3.8, 0.9) -- (3.8, -0.8);
+    
+    % Testo finale
+    \node[right] at (4.0, 0.05) {tutte accettanti};
+\end{tikzpicture}
+\end{center}
+
+Ne consegue che $f \in \text{\#P}$. 
+
+\vspace{0.4cm}
+\textbf{Problema aperto:} $\text{FP} \stackrel{?}{=} \text{\#P}$
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\text{FP} = \text{\#P} \implies \mathcal{P} = \mathcal{NP}$
+
+\textit{Dimostrazione:} Sia $L \in \mathcal{NP} \implies \exists M$ MDT non deterministica polinomiale che accetta $L$. \\
+Sia $f: \Sigma^* \to \mathbb{N}$ la funzione che conta le computazioni accettanti di $M$.
+$$ \implies f \in \text{\#P} \implies f \in \text{FP} $$
+
+$f \in \text{FP}$ significa che posso calcolare $f$ in tempo polinomiale.
+
+\textbf{Algoritmo per decidere $L$:}
+\begin{center}
+\begin{tikzpicture}[>=stealth, thick]
+    \draw (0, 1.2) -- (0, -1.2);
+    
+    \node[align=left, right] at (0.2, 0) {
+        Su input $w$: \\
+        - calcolo $f(w)$ \\
+        - se $f(w) > 0$, accetto $w$ \\
+        - se $f(w) = 0$, rifiuto $w$
+    };
+    
+    \draw[->] (4.5, 0) -- (5.5, 0) node[right] {$L \in \mathcal{P}$};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\mathcal{P} = \text{PSpace} \implies \text{FP} = \text{\#P}$
+
+\textit{Dimostrazione:} Rimane da dimostrare che $\text{\#P} \subseteq \text{FP}$, con $f \in \text{\#P}$. \\
+Sia $M$ una MDT non deterministica polinomiale t.c. $f$ conta le sue computazioni accettanti. \\
+Sia $N$ la MDT deterministica equivalente a $M$, a cui aggiungiamo un nastro per contare le computazioni accettanti.
+
+\begin{flushright}
+\begin{tikzpicture}
+    \node[draw, dashed, align=left, text width=5cm, inner sep=6pt] {\footnotesize il num. tot. di computazioni di $M$ su una stringa di lunghezza $n$ è al più $2^{q(n)}$, con $q(n)$ polinomio};
+\end{tikzpicture}
+\end{flushright}
+
+Sia $L_k = \{ w \mid \text{ci sono almeno } k \text{ computazioni di } M \text{ che accettano } w \}$.
+
+\newpage{}
+\textbf{MDT per calcolare $f$:} \\
+Su input $w$:
+\begin{itemize}
+    \item determino se $w \in L_{\frac{1}{2} 2^{q(n)}}$ usando $N$ e confrontando il numero di computazioni accettate $k$ con $\frac{1}{2} 2^{q(n)}$
+    \item se $k < \frac{1}{2} 2^{q(n)}$, rifaccio con $L_{\frac{1}{4} 2^{q(n)}}$
+    \item se $k \ge \frac{1}{2} 2^{q(n)}$, rifaccio con $L_{\frac{3}{4} 2^{q(n)}}$
+\end{itemize}
+
+\textbf{Complessità in tempo:}
+\begin{itemize}
+    \item $\forall k, L_k \in \text{PSpace} \implies L_k \in \mathcal{P}$
+    \item Il numero di linguaggi da controllare è $\mathcal{O}(\log 2^{q(n)}) = \mathcal{O}(q(n))$
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Esempi:}
+\begin{enumerate}
+    \item \textbf{\#SAT}: dato un polinomio booleano, determinare quanti sono gli assegnamenti che lo soddisfano. ($\text{\#SAT} \in \text{\#P}$)
+    \item \textbf{\#Cycle}: dato un grafo diretto, determinare il numero di cicli semplici del grafo.
+\end{enumerate}
+
+\textbf{Osservazione:} $\text{\#SAT} \in \text{FP} \implies \text{SAT} \in \mathcal{P} \implies \mathcal{P} = \mathcal{NP}$
+
+\vspace{0.4cm}
+\textbf{Proposizione:} $\text{\#Cycle} \in \text{FP} \implies \mathcal{P} = \mathcal{NP}$
+
+\textit{Dimostrazione:} Facciamo vedere che $\text{HAM} \in \mathcal{P}$. Dato $G$ grafo orientato:
+\begin{itemize}
+    \item costruiamo un nuovo grafo orientato $G'$
+    \item facciamo vedere che: $G$ ha un circuito hamiltoniano $\iff G'$ ha almeno $n^{n^2}$ cicli.
+\end{itemize}
+
+\textbf{Costruzione di $G'$:}
+\begin{center}
+\begin{tikzpicture}[>=stealth, scale=1.0, thick]
+    % --- Grafo G ---
+    \node at (1.5, 1) {in $G$:};
+    \node[circle, fill, inner sep=1.5pt, label=below:$u$] (u1) at (0,0) {};
+    \node[circle, fill, inner sep=1.5pt, label=below:$v$] (v1) at (3,0) {};
+    \draw[->] (u1) -- (v1);
+
+    % Freccia transizione
+    \node at (4.5, 0) {$\leadsto$};
+
+    % --- Grafo G' ---
+    \node at (9, 1.2) {in $G'$:};
+    
+    \node[circle, fill, inner sep=1.5pt, label=below:$u$] (u2) at (6,0) {};
+    
+    % Livello 1
+    \node[circle, fill, inner sep=1.2pt] (t1) at (7.5, 0.5) {};
+    \node[circle, fill, inner sep=1.2pt] (b1) at (7.5, -0.5) {};
+    
+    % Livello 2
+    \node[circle, fill, inner sep=1.2pt] (t2) at (8.7, 0.5) {};
+    \node[circle, fill, inner sep=1.2pt] (b2) at (8.7, -0.5) {};
+    
+    % Puntini
+    \node at (9.6, 0) {$\dots$};
+    
+    % Livello k (ultimo)
+    \node[circle, fill, inner sep=1.2pt] (tk) at (10.5, 0.5) {};
+    \node[circle, fill, inner sep=1.2pt] (bk) at (10.5, -0.5) {};
+    
+    \node[circle, fill, inner sep=1.5pt, label=below:$v$] (v2) at (12,0) {};
+
+    % Archi G'
+    \draw[->] (u2) -- (t1);
+    \draw[->] (u2) -- (b1);
+    
+    \draw[->] (t1) -- (t2);
+    \draw[->] (t1) -- (b2);
+    \draw[->] (b1) -- (t2);
+    \draw[->] (b1) -- (b2);
+    
+    \draw[->] (tk) -- (v2);
+    \draw[->] (bk) -- (v2);
+
+    % Graffa
+    \draw[decorate, decoration={brace, amplitude=6pt, mirror}] (7.2, -0.8) -- (10.8, -0.8) node[midway, below=8pt] {$m$ vertici};
+\end{tikzpicture}
+\end{center}
+
+\textbf{Osservazione:} Ogni ciclo semplice di $G$ di lunghezza $l$ genera in $G'$ $(2^m)^l$ cicli semplici.
+
+Scegliamo $m = n \log_2 n$ (supponiamo $n$ potenza di 2).
+
+\textbf{1)} $G$ ha un ciclo hamiltoniano $\implies G'$ ha almeno $n^{n^2}$ cicli. \\
+$$ \text{\# di cicli di } G' \ge (2^m)^n = (2^{n \log_2 n})^n = (n^n)^n = n^{n^2} $$
+
+\textbf{2)} $G$ non ha ciclo hamiltoniano $\implies G'$ ha al più $n^{n^2} - 1$ cicli. \\
+$$ \text{\# di cicli di } G \le n^{n-1} $$
+\begin{align*}
+    \text{\# di cicli di } G' &\le n^{n-1} \cdot (2^m)^{n-1} \\
+    &= n^{n-1} \cdot (2^{n \log_2 n})^{n-1} \\
+    &= n^{n-1} \cdot (n^n)^{n-1} \\
+    &= n^{n-1} \cdot n^{n(n-1)} \\
+    &= n^{n-1 + n^2 - n} \\
+    &= n^{n^2 - 1} < n^{n^2}
+\end{align*}
